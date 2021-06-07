@@ -110,6 +110,9 @@
     <ClInclude Include="References.h" />
     <ClInclude Include="__vm\.D.R.E.E.N.A.vsarduino.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Definitions.cpp" />
+  </ItemGroup>
   <PropertyGroup>
     <DebuggerFlavor>VisualMicroDebugger</DebuggerFlavor>
   </PropertyGroup>
@@ -118,7 +121,7 @@
   </ImportGroup>
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties config.Debug.customdebug_mega_atmega2560_debugger_type="universal" />
+      <UserProperties arduino.upload.port="COM3" config.Debug.customdebug_mega_atmega2560_debugger_type="universal" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>

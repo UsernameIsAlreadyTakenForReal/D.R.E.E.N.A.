@@ -1,7 +1,17 @@
-rapid (<1 sec) | 1 press   - change grip mode
-rapid (<1 sec) | 2 presses - previous grip mode 
+Basic   - Fist
+        - Grip
+Pinches - Pinch 
+	- PinchNoFingers
+Tripods - Tripod
+	- TripodNoFingers
+Extra   - Extra1 (RockOn)
+	- Extra2 (Peace among worlds)
 
-slow (1 - 3 sec) | 1 press - lock
+rapid (<1 sec) | 1 press   - change grip mode (two grip modes in a group)
+rapid (<1 sec) | 2 presses - display battery level || OBSOLETE
+
+slow (1 - 3 sec) | 1 press - next grip group
+slow (1 - 3 sec) | 2 press - lock
 
 v slow (>5 sec) | 1 press  - shut down
 

@@ -31,22 +31,58 @@ Servo pinky;
 // since we control each finger individually, we should define multiple ways of closing the fingers
 // fist - fingers first, then thumb
 // grip - fingers only
-// pinch - thumb, then index
-// tripod - thumb, then index + middle
+// pinch - thumb, then index |
+// tripod - thumb, then index + middle | 
 // extra1 - peace among worlds
 // extra2 - \m/, just because we have a servo on the pinky
 enum gripModes {
 	fist,
 	grip,
 	pinch,
+	pinchNoFingers,
 	tripod,
+	tripodNoFingers,
 	extra1,
 	extra2
 };
 
-// Functions
-void changeGripMode();
-void updateButtonState();
+enum gripGroups {
+	basic,
+	pinches,
+	tripods,
+	extraGrips
+};
 
-// Dev-Only functions
-void printGripMode();
+// Defining ++ and -- for gripModes, since it will be easier to use this instead of a switch() when user sends input
+// Also implementing here because I couldn't get it to work inside Definitions.cpp for whatever reason
+inline gripModes& operator++ (gripModes& m) { // ++
+	return m = (m == gripModes::extra2) ? gripModes::fist : static_cast<gripModes>(static_cast<int>(m) + 1);
+}
+inline gripModes& operator-- (gripModes& m) { // --
+	return m = (m == gripModes::fist) ? gripModes::extra2 : static_cast<gripModes>(static_cast<int>(m) - 1);
+}
+inline gripGroups& operator++ (gripGroups& m) { // ++
+	return m = (m == gripGroups::extraGrips) ? gripGroups::basic : static_cast<gripGroups>(static_cast<int>(m) + 1);
+}
+inline gripGroups& operator-- (gripGroups& m) { // --
+	return m = (m == gripGroups::basic) ? gripGroups::extraGrips : static_cast<gripGroups>(static_cast<int>(m) - 1);
+}
+
+//////////// Function Definitions ////////////
+
+// Button actions
+void TreatButtonAction();
+void UpdateButtonState();
+void ChangeGripMode();
+void UpdateGripMode();
+
+// Servo Actions
+void LockServos();
+
+// Other Actions
+void DisplayBatteryLevel();
+
+
+
+//////////// Dev-Only functions ////////////
+void PrintGripMode();
