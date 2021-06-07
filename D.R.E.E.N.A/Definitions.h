@@ -1,17 +1,17 @@
 #pragma once
 
-//#include "References.h"
+//#include "References.h" // could have worked, but when moving the project out of C:/ (Arduino libraries are located in C:/), the compiler doesn't find Servo.h if it's not #included in the main .ino file
 #include <Servo.h>
 
 // using SG90 servos, wiring is as follows:
 // Red:    VCC    (+)
 // Brown:  Ground (-)
 // Orange: PWM	  (!)
-//Servo thumb;
-//Servo index;
-//Servo middle;
-//Servo ring;
-//Servo pinky;
+Servo thumb;
+Servo index;
+Servo middle;
+Servo ring;
+Servo pinky;
 
 // Arduino pins for each servo PWM pin
 #define servo_Thumb_Pin 3

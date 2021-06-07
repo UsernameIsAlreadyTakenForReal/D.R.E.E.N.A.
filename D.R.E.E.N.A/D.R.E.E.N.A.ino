@@ -3,7 +3,6 @@
 
 #include "Definitions.h"
 #include <Servo.h>
-//#include "Servo.h"
 
 #define Btn_1 9
 #define Btn_2 10
@@ -13,13 +12,14 @@
 int angle = 0;
 bool end;
 
-// used in calculating the amount of time the button has been pressed
+// used in calculating the amount of time and number of times the button has been pressed
 int buttonState = 0;
 int lastButtonState = 0;
-int pressStart;
-int pressStop;
-int pressTime;
-int iddleTime;
+int pressStart = 0;
+int pressStop = 0;
+int pressTime = 0;
+int iddleTime = 0;
+int pressAmount = 0;
 
 // 
 gripModes currentGrip;
@@ -31,7 +31,7 @@ void setup()
     Serial.begin(9600);
 
     // Attaching the pins to each servo 
-    //thumb.attach(servo_Thumb_Pin);
+    thumb.attach(servo_Thumb_Pin);
     //index.attach(servo_Index_Pin);
     //middle.attach(servo_Middle_Pin);
     //ring.attach(servo_Ring_Pin);
@@ -41,7 +41,7 @@ void setup()
     //pinMode(Btn_2, INPUT);
 
     //// Moving each servo to 0
-    //thumb.write(pinkyMaxAngle);
+    thumb.write(0);
     //index.write(0);
     //middle.write(0);
     //ring.write(0);
@@ -87,6 +87,14 @@ void updateButtonState() {
     if (buttonState == HIGH) {
         pressStart = millis();
         iddleTime = pressStart - pressStop;
+
+        if (iddleTime > 5000) { // If there's no button pressed for 5 seconds, the following press will be treated as a new command
+            Serial.println("O noua comanda!");
+        }
+
+        if (iddleTime > 100 && iddleTime < 1500) { // 
+
+        }
     }
     else {
         pressStop = millis();
@@ -99,6 +107,10 @@ void updateButtonState() {
 
         if (pressTime >= 1000) {
             Serial.println("Butonul a fost apasat o secunda");
+        }
+
+        if (pressTime >= 3000) {
+            Serial.println("Shut down");
         }
     }
 }

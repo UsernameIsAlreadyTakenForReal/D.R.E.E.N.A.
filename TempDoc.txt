@@ -1,0 +1,11 @@
+rapid (<1 sec) | 1 press   - change grip mode
+rapid (<1 sec) | 2 presses - previous grip mode 
+
+slow (1 - 3 sec) | 1 press - lock
+
+v slow (>5 sec) | 1 press  - shut down
+
+Basic - fist + grip
+Pinch - w/ + w/o
+Tripod - w/ + w/o
+Extra - 1 + 2
