@@ -81,6 +81,11 @@ void LockServos();
 
 // Other Actions
 void DisplayBatteryLevel();
+void DisplayChar(char let);
+void UpdateDisplay();
+void DisplayClear();
+void DisplayChooseDigit(int i);
+void DisplayInterrupt();
 
 
 
