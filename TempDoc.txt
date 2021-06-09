@@ -6,13 +6,15 @@ Tripods - Tripod
 	- TripodNoFingers
 Extra   - Extra1 (RockOn)
 	- Extra2 (Peace among worlds)
+OpMode  - Grips
+	- Free
 
 rapid (<1 sec) | 1 press   - change grip mode (two grip modes in a group)
-rapid (<1 sec) | 2 presses - display battery level || OBSOLETE
+rapid (<1 sec) | 2 presses - next grip group || OBSOLETE
 
-slow (1 - 3 sec) | 1 press - next grip group
+slow (1 - 3 sec) | 1 press - lock
 
-v slow (3-5 sec) | 1 press - lock
+v slow (3-5 sec) | 1 press - change op mode
 
 vv slow (>5 sec) | 1 press - shut down
 
