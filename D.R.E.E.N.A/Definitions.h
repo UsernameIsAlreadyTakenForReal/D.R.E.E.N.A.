@@ -15,11 +15,18 @@
 #define servoPinkyPin 7
 
 // some servos don't need to go all the way and should be ajusted through testing
-#define pinkyMaxAngle 180
+// also, due to placement, the servos for the Middle and Pinky finger have to rotate in the opposite direction for them to pull the finger
+#define pinkyMaxAngle 0
 #define ringMaxAngle 150
-#define middleMaxAngle 180 
+#define middleMaxAngle 0 
 #define indexMaxAngle 180
 #define thumbMaxAngle 180
+
+#define pinkyMinAngle 180
+#define ringMinAngle 0
+#define middleMinAngle 180
+#define indexMinAngle 0
+#define thumbMinAngle 0
 
 // Pins for the 4 Digit 7-Segment Display. D1-D4 control which Digit is changed (to select a certain digit, put its D pin on LOW!)
 //		  P1

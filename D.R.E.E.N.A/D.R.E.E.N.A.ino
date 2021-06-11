@@ -6,6 +6,9 @@
 
 #define Btn_1 9
 #define Btn_2 11
+
+#define plm 1
+
 #define LEDTemp 13
 #define servoDelay 5
 #define slowServoDelay 15
@@ -29,7 +32,7 @@ bool end;
 int button_state = 1;
 int last_button_state = 1;
 int press_start;
-int press_stop = 2147483647;
+int press_stop = 2147483647; // MAX_INT to avoid having the program think there has been a very long button press when the button is pressed by the user for the first time. 
 int press_time;
 int iddle_time;
 int previous_time = 0; // 1 - short press, 2 - long press
@@ -45,9 +48,7 @@ bool temp_button_firing = false;
 
 // 
 opMode currentMode = opMode::grips;
-
-freeModes currentFree = freeModes::noThumb;
-
+freeModes currentFree = freeModes::noThumb; 
 gripModes currentGrip = gripModes::fist;
 gripGroups currentGroup = gripGroups::basic;
 
@@ -56,6 +57,9 @@ int display_interruption_start_time;
 int display_interruption_type; // 0 - none, 1 - battery, 2 - lock
 int aux_timer_2;
 
+
+// Temp dev stuff
+int rotation_of_ring;
 
 // The setup() function runs once each time the micro-controller starts
 void setup()
@@ -71,12 +75,12 @@ void setup()
     ring.attach(servoRingPin);
     pinky.attach(servoPinkyPin);
 
-    //// Moving each servo to 0
-    thumb.write(0);
-    index.write(0);
-    middle.write(0);
-    ring.write(0);
-    pinky.write(0);
+    // Moving each servo to its 0 position
+    thumb.write(thumbMinAngle);
+    index.write(indexMinAngle);
+    middle.write(middleMinAngle);
+    ring.write(ringMinAngle);
+    pinky.write(pinkyMinAngle);
 
     pinMode(Btn_1, INPUT);
     pinMode(Btn_2, INPUT_PULLUP);
@@ -95,6 +99,32 @@ void setup()
     pinMode(disP5, OUTPUT);
     pinMode(disP6, OUTPUT);
     pinMode(disP7, OUTPUT);
+
+    // Testing servos when reseting
+    /*FlexThumb();
+    delay(500);
+    ExtendThumb();
+    delay(500);
+
+    FlexIndex();
+    delay(500);
+    ExtendIndex();
+    delay(500);
+
+    FlexMiddle();
+    delay(500);
+    ExtendMiddle();
+    delay(500);
+
+    FlexRing();
+    delay(500);
+    ExtendRing();
+    delay(500);
+
+    FlexPinky();
+    delay(500);
+    ExtendPinky();
+    delay(1000);*/
 }
 
 // Loop() function, this bit of code runs forever on the board
@@ -102,99 +132,86 @@ void loop()
 {
     //////////////// Test code ////////////////
 
-    /*FlexThumb();
-    FlexIndex();
-    FlexMiddle();
-    FlexRing();
-    FlexPinky();
-    delay(500);
-    ExtendThumb();
-    ExtendIndex();
-    ExtendMiddle();
-    ExtendRing();
-    ExtendPinky();
-    delay(1000);*/
-
     //////////////// Good code ////////////////
     
-    // Temp
-    temp_button_state = digitalRead(Btn_1);
+    //// Temp
+    //temp_button_state = digitalRead(Btn_1);
 
-    if (temp_button_state != temp_button_last_state) {
+    //if (temp_button_state != temp_button_last_state) {
 
-        if (temp_button_state == 1) {
+    //    if (temp_button_state == 1) {
 
-            if (temp_button_firing == false) {
+    //        if (temp_button_firing == false) {
 
-                temp_button_firing = true;
-                Serial.println("On");
+    //            temp_button_firing = true;
+    //            Serial.println("On");
 
-                if (currentMode == opMode::grips) 
-                    FlexFingersWithGrip();
-                if (currentMode == opMode::freeMovement)
-                    FlexFingersFree();
-            }
+    //            if (currentMode == opMode::grips) 
+    //                FlexFingersWithGrip();
+    //            if (currentMode == opMode::freeMovement)
+    //                FlexFingersFree();
+    //        }
 
-            else {
+    //        else {
 
-                temp_button_firing = false;
-                Serial.println("Off"); 
-                
-                if (currentMode == opMode::grips)
-                    ExtendFingersWithGrip();
-                if (currentMode == opMode::freeMovement)
-                    ExtendFingersFree();
-            }
-        }
-    }
+    //            temp_button_firing = false;
+    //            Serial.println("Off"); 
+    //            
+    //            if (currentMode == opMode::grips)
+    //                ExtendFingersWithGrip();
+    //            if (currentMode == opMode::freeMovement)
+    //                ExtendFingersFree();
+    //        }
+    //    }
+    //}
 
-    temp_button_last_state = temp_button_state;
+    //temp_button_last_state = temp_button_state;
 
-    // this has to keep the display alive (since we use more than 1 letter)
-    // for the "interrupting" displays ( B A t -- flash -- %  || L o c 0 / L o c 1) I will have a bool "NeedsDisplayInterrupt" that, if on true, will go
-    // on to display the 2x2 possible thingies, and when the timer (i.e. millis() - interrupting_display_time_start) goes beyond 2 seconds, bool goes false
-    if (display_interruption_type == 0) {
-     
-        if (currentMode == opMode::freeMovement) {
-            UpdateDisplayFree();
-        }
+    //// this has to keep the display alive (since we use more than 1 letter)
+    //// for the "interrupting" displays ( B A t -- flash -- %  || L o c 0 / L o c 1) I will have a bool "NeedsDisplayInterrupt" that, if on true, will go
+    //// on to display the 2x2 possible thingies, and when the timer (i.e. millis() - interrupting_display_time_start) goes beyond 2 seconds, bool goes false
+    //if (display_interruption_type == 0) {
+    // 
+    //    if (currentMode == opMode::freeMovement) {
+    //        UpdateDisplayFree();
+    //    }
 
-        if (currentMode == opMode::grips) {
-            UpdateDisplayGrips();                   
-        }                                           
-    }        
-    
-    // if there is any kind of display interruption, we will display it accordignly
-    if (display_interruption_type != 0) {
-        DisplayInterrupt();
-        aux_timer_2 = millis() - display_interruption_start_time;
-        if (aux_timer_2 > 2000) {
-            display_interruption_type = 0;
-        }
-    }
-     
-    // Due to the nature of the Arcade button, and using INPUT_PULLUP for it to work, when not pressed, digitalRead(Btn_2) will return HIGH;
-    // we take the current state
-    button_state = digitalRead(Btn_2);  
+    //    if (currentMode == opMode::grips) {
+    //        UpdateDisplayGrips();                   
+    //    }                                           
+    //}        
+    //
+    //// if there is any kind of display interruption, we will display it accordignly
+    //if (display_interruption_type != 0) {
+    //    DisplayInterrupt();
+    //    aux_timer_2 = millis() - display_interruption_start_time;
+    //    if (aux_timer_2 > 2000) {
+    //        display_interruption_type = 0;
+    //    }
+    //}
+    // 
+    //// Due to the nature of the Arcade button, and using INPUT_PULLUP for it to work, when not pressed, digitalRead(Btn_2) will return HIGH;
+    //// we take the current state
+    //button_state = digitalRead(Btn_2);  
 
-    if (button_state != last_button_state) {    // if it has changed
-        UpdateButtonState();                    // fire the function
-    }
+    //if (button_state != last_button_state) {    // if it has changed
+    //    UpdateButtonState();                    // fire the function
+    //}
 
-    // then this piece of magic
-    last_button_state = button_state;
+    //// then this piece of magic
+    //last_button_state = button_state;
 
-    // since we can call millis() very quickly here, we can establish now if only one button was pressed
-    if (short_time == false) {
-        if (button_action_needs_consumption == true) {
-            aux_timer_1 = millis() - press_stop;
-            if (aux_timer_1 > maxIddleTime) {
+    //// since we can call millis() very quickly here, we can establish now if only one button was pressed
+    //if (short_time == false) {
+    //    if (button_action_needs_consumption == true) {
+    //        aux_timer_1 = millis() - press_stop;
+    //        if (aux_timer_1 > maxIddleTime) {
 
-                Serial.print("millis() - press_stop: "); Serial.print(aux_timer_1); Serial.print("\n");
-                TreatButtonAction();
-            }
-        }
-    }
+    //            Serial.print("millis() - press_stop: "); Serial.print(aux_timer_1); Serial.print("\n");
+    //            TreatButtonAction();
+    //        }
+    //    }
+    //}
 }
 
 // ----------------------------- Functions implementations -----------------------------
@@ -235,17 +252,17 @@ void ExtendIndex() {
 }
 
 // Middle
-void FlexMiddle() {
+void FlexMiddle() {    
 
-    for (angle = 0; angle < middleMaxAngle; angle++) {
-        middle.write(angle);
+    for (angle = 0; angle < 180; angle++) {
+        middle.write(middleMinAngle - angle);
         delay(servoDelay);
     }
 }
 void ExtendMiddle() {
 
-    for (angle = middleMaxAngle; angle > 0; angle--) {
-        middle.write(angle);
+    for (angle = 180; angle > 0; angle--) {
+        middle.write(middleMinAngle - angle);
         delay(servoDelay);
     }
 }
@@ -269,15 +286,15 @@ void ExtendRing() {
 // Ring
 void FlexPinky() {
 
-    for (angle = 0; angle < pinkyMaxAngle; angle++) {
-        pinky.write(angle);
+    for (angle = 0; angle < 180; angle++) {
+        pinky.write(pinkyMinAngle - angle);
         delay(servoDelay);
     }
 }
 void ExtendPinky() {
 
-    for (angle = pinkyMaxAngle; angle > 0; angle--) {
-        pinky.write(angle);
+    for (angle = 180; angle > 0; angle--) {
+        pinky.write(pinkyMinAngle - angle);
         delay(servoDelay);
     }
 }
@@ -293,14 +310,14 @@ void FlexFingersWithGrip() {
                 if (angle <= indexMaxAngle)
                     index.write(angle);
 
-                if (angle <= middleMaxAngle)
-                    middle.write(angle);
+                if (middleMinAngle - angle >= middleMaxAngle)
+                    middle.write(middleMinAngle - angle);
 
                 if (angle <= ringMaxAngle)
                     ring.write(angle);
 
-                if (angle <= pinkyMaxAngle)
-                    pinky.write(angle);
+                if (pinkyMinAngle - angle >= pinkyMaxAngle)
+                    pinky.write(pinkyMinAngle - angle);
 
                 delay(servoDelay);
             }
@@ -321,14 +338,14 @@ void FlexFingersWithGrip() {
                 if (angle <= indexMaxAngle)
                     index.write(angle);
 
-                if (angle <= middleMaxAngle)
-                    middle.write(angle);
+                if (middleMinAngle - angle >= middleMaxAngle)
+                    middle.write(middleMinAngle - angle);
 
                 if (angle <= ringMaxAngle)
                     ring.write(angle);
 
-                if (angle <= pinkyMaxAngle)
-                    pinky.write(angle);
+                if (pinkyMinAngle - angle >= pinkyMaxAngle)
+                    pinky.write(pinkyMinAngle - angle);
 
                 delay(servoDelay);
             }
@@ -383,8 +400,8 @@ void FlexFingersWithGrip() {
                 if (angle <= indexMaxAngle)
                     index.write(angle);
 
-                if (angle <= middleMaxAngle)
-                    middle.write(angle);
+                if (middleMinAngle - angle >= middleMaxAngle)
+                    middle.write(middleMinAngle - angle);
 
                 delay(servoDelay);
             }
@@ -405,8 +422,8 @@ void FlexFingersWithGrip() {
                 if (angle <= indexMaxAngle)
                     index.write(angle);
 
-                if (angle <= middleMaxAngle)
-                    middle.write(angle);
+                if (middleMinAngle - angle >= middleMaxAngle)
+                    middle.write(middleMinAngle - angle);
 
                 delay(servoDelay);
             }
@@ -416,8 +433,8 @@ void FlexFingersWithGrip() {
             
             for (angle = 0; angle < 180; angle++) {
 
-                if (angle <= middleMaxAngle)
-                    middle.write(angle);
+                if (middleMinAngle - angle >= middleMaxAngle)
+                    middle.write(middleMinAngle - angle);
 
                 if (angle <= ringMaxAngle)
                     ring.write(angle);
@@ -436,8 +453,8 @@ void FlexFingersWithGrip() {
                 if (angle <= ringMaxAngle)
                     ring.write(angle);
 
-                if (angle <= pinkyMaxAngle)
-                    pinky.write(angle);
+                if (pinkyMinAngle - angle >= pinkyMaxAngle)
+                    pinky.write(pinkyMinAngle - angle);
 
                 delay(servoDelay);
             }
@@ -456,14 +473,14 @@ void ExtendFingersWithGrip() {
             if (angle <= indexMaxAngle)
                 index.write(angle);
 
-            if (angle <= middleMaxAngle)
-                middle.write(angle);
+            if (middleMinAngle - angle >= middleMaxAngle)
+                middle.write(middleMinAngle - angle);
 
             if (angle <= ringMaxAngle)
                 ring.write(angle);
 
-            if (angle <= pinkyMaxAngle)
-                pinky.write(angle);
+            if (pinkyMinAngle - angle >= pinkyMaxAngle)
+                pinky.write(pinkyMinAngle - angle);
 
             delay(servoDelay);
         }
@@ -471,106 +488,106 @@ void ExtendFingersWithGrip() {
     }
     case gripModes::grip: {
 
-        for (angle = thumbMaxAngle; angle > 0; angle--) {
-
-            thumb.write(angle);
-            delay(servoDelay);
-        }
-
-        delay(500);
-
         for (angle = 180; angle > 0; angle--) {
 
             if (angle <= indexMaxAngle)
                 index.write(angle);
 
-            if (angle <= middleMaxAngle)
-                middle.write(angle);
+            if (middleMinAngle - angle >= middleMaxAngle)
+                middle.write(middleMinAngle - angle);
 
             if (angle <= ringMaxAngle)
                 ring.write(angle);
 
-            if (angle <= pinkyMaxAngle)
-                pinky.write(angle);
+            if (pinkyMinAngle - angle >= pinkyMaxAngle)
+                pinky.write(pinkyMinAngle - angle);
 
+            delay(servoDelay);
+        }
+
+        delay(500);
+
+        for (angle = thumbMaxAngle; angle > 0; angle--) {
+
+            thumb.write(angle);
             delay(servoDelay);
         }
         break;
     }
     case gripModes::pinch: {
 
-        for (angle = thumbMaxAngle; angle > 0; angle--) {
+        for (angle = indexMaxAngle; angle > 0; angle--) {
 
-            thumb.write(angle);
+            index.write(angle);
             delay(servoDelay);
         }
 
         delay(500);
 
-        for (angle = indexMaxAngle; angle > 0; angle--) {
+        for (angle = thumbMaxAngle; angle > 0; angle--) {
 
-            index.write(angle);
+            thumb.write(angle);
             delay(servoDelay);
         }
         break;
     }
     case gripModes::pinchNoFingers: {
 
-        for (angle = thumbMaxAngle; angle > 0; angle--) {
+        for (angle = indexMaxAngle; angle > 0; angle--) {
 
-            thumb.write(angle);
+            index.write(angle);
             delay(servoDelay);
         }
 
         delay(500);
 
-        for (angle = indexMaxAngle; angle > 0; angle--) {
+        for (angle = thumbMaxAngle; angle > 0; angle--) {
 
-            index.write(angle);
+            thumb.write(angle);
             delay(servoDelay);
         }
         break;
     }
     case gripModes::tripod: {
 
-        for (angle = thumbMaxAngle; angle > 0; angle--) {
-
-            thumb.write(angle);
-            delay(servoDelay);
-        }
-
-        delay(500);
-
         for (angle = 180; angle > 0; angle--) {
 
             if (angle <= indexMaxAngle)
                 index.write(angle);
 
-            if (angle <= middleMaxAngle)
-                middle.write(angle);
+            if (middleMinAngle - angle >= middleMaxAngle)
+                middle.write(middleMinAngle - angle);
 
+            delay(servoDelay);
+        }
+
+        delay(500);
+
+        for (angle = thumbMaxAngle; angle > 0; angle--) {
+
+            thumb.write(angle);
             delay(servoDelay);
         }
         break;
     }
     case gripModes::tripodNoFingers: {
 
-        for (angle = thumbMaxAngle; angle > 0; angle--) {
-
-            thumb.write(angle);
-            delay(servoDelay);
-        }
-
-        delay(500);
-
         for (angle = 180; angle > 0; angle--) {
 
             if (angle <= indexMaxAngle)
                 index.write(angle);
 
-            if (angle <= middleMaxAngle)
-                middle.write(angle);
+            if (middleMinAngle - angle >= middleMaxAngle)
+                middle.write(middleMinAngle - angle);
 
+            delay(servoDelay);
+        }
+
+        delay(500);
+
+        for (angle = thumbMaxAngle; angle > 0; angle--) {
+
+            thumb.write(angle);
             delay(servoDelay);
         }
         break;
@@ -579,8 +596,8 @@ void ExtendFingersWithGrip() {
 
         for (angle = 180; angle > 0; angle--) {
 
-            if (angle <= middleMaxAngle)
-                middle.write(angle);
+            if (middleMinAngle - angle >= middleMaxAngle)
+                middle.write(middleMinAngle - angle);
 
             if (angle <= ringMaxAngle)
                 ring.write(angle);
@@ -599,8 +616,8 @@ void ExtendFingersWithGrip() {
             if (angle <= ringMaxAngle)
                 ring.write(angle);
 
-            if (angle <= pinkyMaxAngle)
-                pinky.write(angle);
+            if (pinkyMinAngle - angle >= pinkyMaxAngle)
+                pinky.write(pinkyMinAngle - angle);
 
             delay(servoDelay);
         }

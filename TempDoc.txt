@@ -10,7 +10,7 @@ OpMode  - Grips
 	- Free
 
 rapid (<1 sec) | 1 press   - change grip mode (two grip modes in a group)
-rapid (<1 sec) | 2 presses - next grip group || OBSOLETE
+rapid (<1 sec) | 2 presses - next grip group
 
 slow (1 - 3 sec) | 1 press - lock
 
