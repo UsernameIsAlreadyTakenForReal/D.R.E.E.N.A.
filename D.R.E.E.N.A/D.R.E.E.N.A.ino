@@ -171,8 +171,10 @@ void loop()
                 temp_button_firing = true;
                 Serial.println("On");
 
-                if (currentMode == opMode::grips) 
-                    FlexFingersWithGrip();
+                if (are_servers_locked == false) {
+                    if (currentMode == opMode::grips)
+                        FlexFingersWithGrip();
+                }
             }
 
             else {
@@ -180,75 +182,79 @@ void loop()
                 temp_button_firing = false;
                 Serial.println("Off"); 
                 
-                if (currentMode == opMode::grips)
-                    ExtendFingersWithGrip();
+                if (are_servers_locked == false) {
+                    if (currentMode == opMode::grips)
+                        ExtendFingersWithGrip();
+                }
             }
         }
     }
 
     temp_button_last_state = temp_button_state;
 
-    if (currentMode == opMode::freeMovement) {
+    if (are_servers_locked == false) {
+        if (currentMode == opMode::freeMovement) {
 
-        if (temp_button_firing == true && temp_button_state == 1) { // if the button is pressed and "ON"
-            if (angle < 180) {
-                angle++;
+            if (temp_button_firing == true && temp_button_state == 1) { // if the button is pressed and "ON"
+                if (angle < 180) {
+                    angle++;
 
 
-                if (angle < indexMaxAngle) {
-                    index.write(angle);
-                }
-
-                if (middleMinAngle - angle >= middleMaxAngle) {
-                    middle.write(middleMinAngle - angle);
-                }
-
-                if (angle < ringMaxAngle) {
-                    ring.write(angle);
-                }
-
-                if (pinkyMinAngle - angle >= pinkyMaxAngle) {
-                    pinky.write(pinkyMinAngle - angle);
-                }
-
-                if (currentFree == freeModes::withThumb) {
-
-                    if (angle < thumbMaxAngle) {
-                        thumb.write(angle);
+                    if (angle < indexMaxAngle) {
+                        index.write(angle);
                     }
+
+                    if (middleMinAngle - angle >= middleMaxAngle) {
+                        middle.write(middleMinAngle - angle);
+                    }
+
+                    if (angle < ringMaxAngle) {
+                        ring.write(angle);
+                    }
+
+                    if (pinkyMinAngle - angle >= pinkyMaxAngle) {
+                        pinky.write(pinkyMinAngle - angle);
+                    }
+
+                    if (currentFree == freeModes::withThumb) {
+
+                        if (angle < thumbMaxAngle) {
+                            thumb.write(angle);
+                        }
+                    }
+                    delay(slowServoDelay);
                 }
-                delay(slowServoDelay);
+
             }
 
-        }
+            if (temp_button_firing == false && temp_button_state == 1) { // if the button is pressed and "OFF"
 
-        if (temp_button_firing == false && temp_button_state == 1) { // if the button is pressed and "OFF"
-            
-            if (angle > 0) {
-                angle--;
+                if (angle > 0) {
+                    angle--;
 
-                if (angle > indexMinAngle) {
-                    index.write(angle);
-                }
-
-                if (middleMinAngle - angle >= middleMaxAngle) {
-                    middle.write(middleMinAngle - angle);
-                }
-
-                if (angle > ringMinAngle) {
-                    ring.write(angle);
-                }
-
-                if (pinkyMinAngle - angle >= pinkyMaxAngle) {
-                    pinky.write(pinkyMinAngle - angle);
-                }
-
-                if (currentFree == freeModes::withThumb) {
-                    if (angle > thumbMinAngle) {
-                        thumb.write(angle);
+                    if (angle > indexMinAngle) {
+                        index.write(angle);
                     }
+
+                    if (middleMinAngle - angle >= middleMaxAngle) {
+                        middle.write(middleMinAngle - angle);
+                    }
+
+                    if (angle > ringMinAngle) {
+                        ring.write(angle);
+                    }
+
+                    if (pinkyMinAngle - angle >= pinkyMaxAngle) {
+                        pinky.write(pinkyMinAngle - angle);
+                    }
+
+                    if (currentFree == freeModes::withThumb) {
+                        if (angle > thumbMinAngle) {
+                            thumb.write(angle);
+                        }
+                    }
+                    delay(slowServoDelay);
                 }
-                delay(slowServoDelay);
             }
         }
     }
@@ -978,20 +984,30 @@ void TreatButtonAction() {
     case false: // a single press of the button
 
         if (press_time >= 100 && press_time < 1000) { // using [100, 1000] interval, instead of [0, 1000], to avoid any undesired impulse to be seen as an input here
-            Serial.println("Butonul a fost apasat o jumatate de secunda");
-            ChangeGripMode();
+            if (are_servers_locked == false) {
+                Serial.println("...Changing Grip...");
+                ChangeGripMode();
+            }
         }
 
         if (press_time >= 1000 && press_time < 3000) {
             Serial.println("...Locking Servos...");
             display_interruption_start_time = millis();
             display_interruption_type = 2;
-            are_servers_locked = true;
+
+            if (are_servers_locked == false) {
+                are_servers_locked = true;
+            }
+            else {
+                are_servers_locked = false;
+            }
         }
 
         if (press_time >= 3000 && press_time <5000) {
-            Serial.println("...Changing Mode...");
-            currentMode++;
+            if (are_servers_locked == false) {
+                Serial.println("...Changing Mode...");
+                currentMode++;
+            }
         }
 
         if (press_time >= 5000) {
@@ -1003,17 +1019,19 @@ void TreatButtonAction() {
 
     case true:
 
-        ++currentGroup;
-        UpdateGripMode();
+        if (are_servers_locked == false) {
+            ++currentGroup;
+            UpdateGripMode();
+        }
         break;
     }
 
-    Serial.print("--- Au fost "); Serial.print(press_counter); Serial.println(" apasari --- \n");
     button_action_needs_consumption = false;
     short_time = false;
     press_counter = 0;
     previous_time = 0;
     iddle_time = 0;    
+    press_start = 2147483647;
 }
 
 // goes to the first grip mode in a group when the group is changed
