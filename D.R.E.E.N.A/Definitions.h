@@ -17,7 +17,7 @@
 // some servos don't need to go all the way and should be ajusted through testing
 // also, due to placement, the servos for the Middle and Pinky finger have to rotate in the opposite direction for them to pull the finger
 #define pinkyMaxAngle 0
-#define ringMaxAngle 150
+#define ringMaxAngle 180
 #define middleMaxAngle 0 
 #define indexMaxAngle 180
 #define thumbMaxAngle 180

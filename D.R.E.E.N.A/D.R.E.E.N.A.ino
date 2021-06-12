@@ -14,6 +14,13 @@
 #define slowServoDelay 15
 #define maxIddleTime 2000
 
+#define sensorPin A11 
+#define sensorThreshold 2.5
+#define sensorDelay 5   // so we do not overload the pin and the sensor. The point to make here is that we want to read the sensor at all times
+                        // so that means inside the loop() function, yet we should delay it by this amount so we don't overload. At the time of
+                        // writing this, no test has yet been undergone and I cannot say for sure if it will interfere with the button and dis-
+                        // play functions. Let's hope not
+
 // using SG90 servos, wiring is as follows:
 // Red:    VCC    (+)
 // Brown:  Ground (-)
@@ -24,6 +31,7 @@ Servo index;
 Servo middle;
 Servo ring;
 Servo pinky;
+bool are_servers_locked = false;
 
 int angle = 0;
 bool end;
@@ -31,7 +39,7 @@ bool end;
 // used in calculating the amount of time and number of times the button has been pressed
 int button_state = 1;
 int last_button_state = 1;
-int press_start;
+int press_start = 2147483647;
 int press_stop = 2147483647; // MAX_INT to avoid having the program think there has been a very long button press when the button is pressed by the user for the first time. 
 int press_time;
 int iddle_time;
@@ -41,13 +49,14 @@ bool button_action_needs_consumption = false;
 int press_counter = 0;
 int aux_timer_1;
 
-// temp stuff
+// EXTRA stuff
 int temp_button_state = 0;
 int temp_button_last_state = 0;
 bool temp_button_firing = false;
+int led_time = 0;
 
 // 
-opMode currentMode = opMode::grips;
+opMode currentMode = opMode::freeMovement;
 freeModes currentFree = freeModes::noThumb; 
 gripModes currentGrip = gripModes::fist;
 gripGroups currentGroup = gripGroups::basic;
@@ -58,8 +67,9 @@ int display_interruption_type; // 0 - none, 1 - battery, 2 - lock
 int aux_timer_2;
 
 
-// Temp dev stuff
-int rotation_of_ring;
+// At last, the sensor itself
+int sensor_value;           // for analogRead()
+float voltage;              // to get an actual value that makes sense
 
 // The setup() function runs once each time the micro-controller starts
 void setup()
@@ -132,86 +142,198 @@ void loop()
 {
     //////////////// Test code ////////////////
 
+    
+
     //////////////// Good code ////////////////
     
-    //// Temp
-    //temp_button_state = digitalRead(Btn_1);
+    //// Temp -- will be replaced with the sensor variant
+    temp_button_state = digitalRead(Btn_1);
 
-    //if (temp_button_state != temp_button_last_state) {
+    /*sensor_value = analogRead(sensorPin);
+    voltage = sensor_value * (5.0 / 1023.0);
 
-    //    if (temp_button_state == 1) {
+    Serial.println(voltage);
 
-    //        if (temp_button_firing == false) {
+    if (voltage > sensorThreshold) {
+        temp_button_state = 1;
+    }
 
-    //            temp_button_firing = true;
-    //            Serial.println("On");
+    else {
+        temp_button_state = 0;
+    }*/
 
-    //            if (currentMode == opMode::grips) 
-    //                FlexFingersWithGrip();
-    //            if (currentMode == opMode::freeMovement)
-    //                FlexFingersFree();
-    //        }
+    if (temp_button_state != temp_button_last_state) {
 
-    //        else {
+        if (temp_button_state == 1) {
 
-    //            temp_button_firing = false;
-    //            Serial.println("Off"); 
-    //            
-    //            if (currentMode == opMode::grips)
-    //                ExtendFingersWithGrip();
-    //            if (currentMode == opMode::freeMovement)
-    //                ExtendFingersFree();
-    //        }
-    //    }
-    //}
+            if (temp_button_firing == false) {
 
-    //temp_button_last_state = temp_button_state;
+                temp_button_firing = true;
+                Serial.println("On");
 
-    //// this has to keep the display alive (since we use more than 1 letter)
-    //// for the "interrupting" displays ( B A t -- flash -- %  || L o c 0 / L o c 1) I will have a bool "NeedsDisplayInterrupt" that, if on true, will go
-    //// on to display the 2x2 possible thingies, and when the timer (i.e. millis() - interrupting_display_time_start) goes beyond 2 seconds, bool goes false
-    //if (display_interruption_type == 0) {
-    // 
-    //    if (currentMode == opMode::freeMovement) {
-    //        UpdateDisplayFree();
-    //    }
+                if (currentMode == opMode::grips) 
+                    FlexFingersWithGrip();
+            }
 
-    //    if (currentMode == opMode::grips) {
-    //        UpdateDisplayGrips();                   
-    //    }                                           
-    //}        
-    //
-    //// if there is any kind of display interruption, we will display it accordignly
-    //if (display_interruption_type != 0) {
-    //    DisplayInterrupt();
-    //    aux_timer_2 = millis() - display_interruption_start_time;
-    //    if (aux_timer_2 > 2000) {
-    //        display_interruption_type = 0;
-    //    }
-    //}
-    // 
-    //// Due to the nature of the Arcade button, and using INPUT_PULLUP for it to work, when not pressed, digitalRead(Btn_2) will return HIGH;
-    //// we take the current state
-    //button_state = digitalRead(Btn_2);  
+            else {
 
-    //if (button_state != last_button_state) {    // if it has changed
-    //    UpdateButtonState();                    // fire the function
-    //}
+                temp_button_firing = false;
+                Serial.println("Off"); 
+                
+                if (currentMode == opMode::grips)
+                    ExtendFingersWithGrip();
+            }
+        }
+    }
 
-    //// then this piece of magic
-    //last_button_state = button_state;
+    temp_button_last_state = temp_button_state;
 
-    //// since we can call millis() very quickly here, we can establish now if only one button was pressed
-    //if (short_time == false) {
-    //    if (button_action_needs_consumption == true) {
-    //        aux_timer_1 = millis() - press_stop;
-    //        if (aux_timer_1 > maxIddleTime) {
+    if (currentMode == opMode::freeMovement) {
 
-    //            Serial.print("millis() - press_stop: "); Serial.print(aux_timer_1); Serial.print("\n");
-    //            TreatButtonAction();
-    //        }
-    //    }
-    //}
+        if (temp_button_firing == true && temp_button_state == 1) { // if the button is pressed and "ON"
+            if (angle < 180) {
+                angle++;
+
+
+                if (angle < indexMaxAngle) {
+                    index.write(angle);
+                }
+
+                if (middleMinAngle - angle >= middleMaxAngle) {
+                    middle.write(middleMinAngle - angle);
+                }
+
+                if (angle < ringMaxAngle) {
+                    ring.write(angle);
+                }
+
+                if (pinkyMinAngle - angle >= pinkyMaxAngle) {
+                    pinky.write(pinkyMinAngle - angle);
+                }
+
+                if (currentFree == freeModes::withThumb) {
+
+                    if (angle < thumbMaxAngle) {
+                        thumb.write(angle);
+                    }
+                }
+                delay(slowServoDelay);
+            }
+
+        }
+
+        if (temp_button_firing == false && temp_button_state == 1) { // if the button is pressed and "OFF"
+            
+            if (angle > 0) {
+                angle--;
+
+                if (angle > indexMinAngle) {
+                    index.write(angle);
+                }
+
+                if (middleMinAngle - angle >= middleMaxAngle) {
+                    middle.write(middleMinAngle - angle);
+                }
+
+                if (angle > ringMinAngle) {
+                    ring.write(angle);
+                }
+
+                if (pinkyMinAngle - angle >= pinkyMaxAngle) {
+                    pinky.write(pinkyMinAngle - angle);
+                }
+
+                if (currentFree == freeModes::withThumb) {
+                    if (angle > thumbMinAngle) {
+                        thumb.write(angle);
+                    }
+                }
+                delay(slowServoDelay);
+            }
+        }
+    }
+
+    // this has to keep the display alive (since we use more than 1 letter)
+    // for the "interrupting" displays ( B A t -- flash -- %  || L o c 0 / L o c 1) I will have a bool "NeedsDisplayInterrupt" that, if on true, will go
+    // on to display the 2x2 possible thingies, and when the timer (i.e. millis() - interrupting_display_time_start) goes beyond 2 seconds, bool goes false
+    if (display_interruption_type == 0) {
+     
+        if (currentMode == opMode::freeMovement) {
+            UpdateDisplayFree();
+        }
+
+        if (currentMode == opMode::grips) {
+            UpdateDisplayGrips();                   
+        }                                           
+    }        
+    
+    // if there is any kind of display interruption, we will display it accordignly
+    if (display_interruption_type != 0) {
+        DisplayInterrupt();
+        aux_timer_2 = millis() - display_interruption_start_time;
+        if (aux_timer_2 > 2000) {
+            display_interruption_type = 0;
+        }
+    }
+     
+    // Due to the nature of the Arcade button, and using INPUT_PULLUP for it to work, when not pressed, digitalRead(Btn_2) will return HIGH;
+    // we take the current state
+    button_state = digitalRead(Btn_2);  
+
+    if (button_state != last_button_state) {    // if it has changed
+        UpdateButtonState();                    // fire the function
+    }
+
+    // then this piece of magic
+    last_button_state = button_state;
+
+    // since we can call millis() very quickly here, we can establish now if only one button was pressed
+    if (short_time == false) {
+        if (button_action_needs_consumption == true) {
+            aux_timer_1 = millis() - press_stop;
+            if (aux_timer_1 > maxIddleTime) {
+
+                Serial.print("millis() - press_stop: "); Serial.print(aux_timer_1); Serial.print("\n");
+                TreatButtonAction();
+            }
+        }
+    }
+
+    if (button_state = 1) {
+        led_time = millis() - press_start;
+
+        if (led_time > 980 && led_time < 1020) {
+            digitalWrite(LEDTemp, LOW);
+            delay(10);
+            digitalWrite(LEDTemp, HIGH);
+        }
+
+        if (led_time > 1980 && led_time < 2020) {
+            digitalWrite(LEDTemp, LOW);
+            delay(10);
+            digitalWrite(LEDTemp, HIGH);
+        }
+
+        if (led_time > 2980 && led_time < 3020) {
+            digitalWrite(LEDTemp, LOW);
+            delay(10);
+            digitalWrite(LEDTemp, HIGH);
+        }
+
+        if (led_time > 3980 && led_time < 4020) {
+            digitalWrite(LEDTemp, LOW);
+            delay(10);
+            digitalWrite(LEDTemp, HIGH);
+        }
+
+        if (led_time > 4980 && led_time < 5020) {
+            digitalWrite(LEDTemp, LOW);
+            delay(10);
+            digitalWrite(LEDTemp, HIGH);
+        }
+    }
+
+    //delay(sensorDelay);
 }
 
 // ----------------------------- Functions implementations -----------------------------
@@ -283,7 +405,7 @@ void ExtendRing() {
     }
 }
 
-// Ring
+// Pinky
 void FlexPinky() {
 
     for (angle = 0; angle < 180; angle++) {
@@ -626,16 +748,6 @@ void ExtendFingersWithGrip() {
     }
 }
 
-void FlexFingersFree() {
-
-    Serial.println("FLEXAM CU SPOR");
-}
-
-void ExtendFingersFree() {
-
-    Serial.println("EXTINDEM CU SPOR");
-}
-
 void DisplayInterrupt() {
 
     switch (display_interruption_type)
@@ -874,7 +986,7 @@ void TreatButtonAction() {
             Serial.println("...Locking Servos...");
             display_interruption_start_time = millis();
             display_interruption_type = 2;
-            //LockServos();
+            are_servers_locked = true;
         }
 
         if (press_time >= 3000 && press_time <5000) {
@@ -959,16 +1071,28 @@ void ChangeGripMode() {
             case gripGroups::pinches:
                 if (currentGrip == gripModes::pinch) {
                     currentGrip = gripModes::pinchNoFingers;
+                    FlexPinky();
+                    FlexRing();
+                    FlexMiddle();
                 }
-                else if (currentGrip == gripModes::pinchNoFingers)
+                else if (currentGrip == gripModes::pinchNoFingers) {
                     currentGrip = gripModes::pinch;
+                    ExtendPinky();
+                    ExtendRing();
+                    ExtendMiddle();
+                }
                 break;
             case gripGroups::tripods:
                 if (currentGrip == gripModes::tripod) {
                     currentGrip = gripModes::tripodNoFingers;
+                    FlexPinky();
+                    FlexRing();
                 }
-                else if (currentGrip == gripModes::tripodNoFingers)
+                else if (currentGrip == gripModes::tripodNoFingers) {
                     currentGrip = gripModes::tripod;
+                    ExtendPinky();
+                    ExtendRing();
+                }
                 break;
             case gripGroups::extraGrips:
                 if (currentGrip == gripModes::extra1) {
