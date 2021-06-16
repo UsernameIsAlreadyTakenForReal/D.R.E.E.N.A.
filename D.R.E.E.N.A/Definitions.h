@@ -135,10 +135,7 @@ void DisplayChooseDigit(int i);
 void DisplayInterrupt();
 
 
-
 //////////// Dev-Only functions ////////////
 void PrintGripMode();
-
-
 
 #endif // !_Definitions_h

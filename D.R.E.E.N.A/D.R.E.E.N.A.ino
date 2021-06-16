@@ -7,15 +7,13 @@
 #define Btn_1 9
 #define Btn_2 11
 
-#define plm 1
-
 #define LEDTemp 13
 #define servoDelay 5
 #define slowServoDelay 15
 #define maxIddleTime 2000
 
-#define sensorPin A11 
 #define sensorThreshold 2.5
+#define sensorPin A11 
 #define sensorDelay 5   // so we do not overload the pin and the sensor. The point to make here is that we want to read the sensor at all times
                         // so that means inside the loop() function, yet we should delay it by this amount so we don't overload. At the time of
                         // writing this, no test has yet been undergone and I cannot say for sure if it will interfere with the button and dis-
@@ -65,7 +63,6 @@ gripGroups currentGroup = gripGroups::basic;
 int display_interruption_start_time;
 int display_interruption_type; // 0 - none, 1 - battery, 2 - lock
 int aux_timer_2;
-
 
 // At last, the sensor itself
 int sensor_value;           // for analogRead()
@@ -135,14 +132,14 @@ void setup()
     delay(500);
     ExtendPinky();
     delay(1000);*/
+
+
 }
 
 // Loop() function, this bit of code runs forever on the board
 void loop()
 {
     //////////////// Test code ////////////////
-
-    
 
     //////////////// Good code ////////////////
     
@@ -339,7 +336,7 @@ void loop()
         }
     }
 
-    //delay(sensorDelay);
+    delay(sensorDelay);
 }
 
 // ----------------------------- Functions implementations -----------------------------
@@ -1011,8 +1008,10 @@ void TreatButtonAction() {
         }
 
         if (press_time >= 5000) {
-            Serial.println("...Shut down...");
-            //ShutDown();
+            if (are_servers_locked == false) {
+                Serial.println("...Shut down...");
+                //ShutDown();
+            }
         }
 
         break;
@@ -1020,8 +1019,11 @@ void TreatButtonAction() {
     case true:
 
         if (are_servers_locked == false) {
-            ++currentGroup;
-            UpdateGripMode();
+
+            if (currentMode == opMode::grips) {
+                ++currentGroup;
+                UpdateGripMode();
+            }
         }
         break;
     }
