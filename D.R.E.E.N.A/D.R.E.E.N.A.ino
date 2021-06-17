@@ -3,11 +3,12 @@
 
 #include "Definitions.h"
 #include <Servo.h>
+#include <avr/sleep.h>
 
 #define Btn_1 9
-#define Btn_2 11
+#define Btn_2 21
 
-#define LEDTemp 13
+#define LEDTemp 12
 #define servoDelay 5
 #define slowServoDelay 15
 #define maxIddleTime 2000
@@ -48,9 +49,9 @@ int press_counter = 0;
 int aux_timer_1;
 
 // EXTRA stuff
-int temp_button_state = 0;
-int temp_button_last_state = 0;
-bool temp_button_firing = false;
+int sensor_state = 0;
+int sensor_last_state = 0;
+bool system_firing = false;
 int led_time = 0;
 
 // 
@@ -133,18 +134,19 @@ void setup()
     ExtendPinky();
     delay(1000);*/
 
-
+    digitalWrite(LEDTemp, LOW);
 }
 
 // Loop() function, this bit of code runs forever on the board
 void loop()
 {
     //////////////// Test code ////////////////
+    //digitalWrite(LEDTemp, LOW);
 
-    //////////////// Good code ////////////////
+    ////////////////// Good code ////////////////
     
     //// Temp -- will be replaced with the sensor variant
-    temp_button_state = digitalRead(Btn_1);
+    sensor_state = digitalRead(Btn_1);
 
     /*sensor_value = analogRead(sensorPin);
     voltage = sensor_value * (5.0 / 1023.0);
@@ -152,20 +154,20 @@ void loop()
     Serial.println(voltage);
 
     if (voltage > sensorThreshold) {
-        temp_button_state = 1;
+        sensor_state = 1;
     }
 
     else {
-        temp_button_state = 0;
+        sensor_state = 0;
     }*/
 
-    if (temp_button_state != temp_button_last_state) {
+    if (sensor_state != sensor_last_state) {
 
-        if (temp_button_state == 1) {
+        if (sensor_state == 1) {
 
-            if (temp_button_firing == false) {
+            if (system_firing == false) {
 
-                temp_button_firing = true;
+                system_firing = true;
                 Serial.println("On");
 
                 if (are_servers_locked == false) {
@@ -176,7 +178,7 @@ void loop()
 
             else {
 
-                temp_button_firing = false;
+                system_firing = false;
                 Serial.println("Off"); 
                 
                 if (are_servers_locked == false) {
@@ -187,12 +189,14 @@ void loop()
         }
     }
 
-    temp_button_last_state = temp_button_state;
+    sensor_last_state = sensor_state;
 
+    // Free mode rotations
     if (are_servers_locked == false) {
         if (currentMode == opMode::freeMovement) {
 
-            if (temp_button_firing == true && temp_button_state == 1) { // if the button is pressed and "ON"
+            if (system_firing == true && sensor_state == 1) { // if the button is pressed and "ON" || if the sensor senses signal and „ON”
+
                 if (angle < 180) {
                     angle++;
 
@@ -224,7 +228,7 @@ void loop()
 
             }
 
-            if (temp_button_firing == false && temp_button_state == 1) { // if the button is pressed and "OFF"
+            if (system_firing == false && sensor_state == 1) { // if the button is pressed and "OFF"
 
                 if (angle > 0) {
                     angle--;
@@ -337,6 +341,25 @@ void loop()
     }
 
     delay(sensorDelay);
+}
+
+// ----------------------------- SLEEP MODE MANAGER -----------------------------
+void SleepMode() {
+
+    DisplayClear();
+    sleep_enable();
+    attachInterrupt(2, WakeUp, LOW);
+    Serial.println("1");
+    set_sleep_mode(SLEEP_MODE_STANDBY);
+    //set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+    delay(1000);
+    sleep_cpu();
+}
+
+void WakeUp() {
+    Serial.println("muie a todos");
+    sleep_disable();
+    detachInterrupt(Btn_2);
 }
 
 // ----------------------------- Functions implementations -----------------------------
@@ -955,7 +978,8 @@ void UpdateButtonState() {
         press_start = millis();
         iddle_time = press_start - press_stop;
         digitalWrite(LEDTemp, HIGH);
-
+        Serial.println("aici??");
+            
         if (iddle_time > 50 && iddle_time < 1800) {
             short_time = true;
             Serial.print("Cretinule\n");
@@ -1010,7 +1034,7 @@ void TreatButtonAction() {
         if (press_time >= 5000) {
             if (are_servers_locked == false) {
                 Serial.println("...Shut down...");
-                //ShutDown();
+                //SleepMode();
             }
         }
 
