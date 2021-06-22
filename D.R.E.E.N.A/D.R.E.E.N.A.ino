@@ -8,7 +8,7 @@
 #define Btn_1 9
 #define Btn_2 21
 
-#define LEDTemp 11
+#define LEDTemp 16
 #define servoDelay 5
 #define slowServoDelay 15
 #define maxIddleTime 2000
@@ -93,8 +93,6 @@ void setup()
     pinMode(Btn_1, INPUT);
     pinMode(Btn_2, INPUT_PULLUP);
 
-    pinMode(LEDTemp, OUTPUT);
-
     pinMode(disD1, OUTPUT);
     pinMode(disD2, OUTPUT);
     pinMode(disD3, OUTPUT);
@@ -107,6 +105,8 @@ void setup()
     pinMode(disP5, OUTPUT);
     pinMode(disP6, OUTPUT);
     pinMode(disP7, OUTPUT);
+
+    pinMode(LEDTemp, OUTPUT);
 
     // Testing servos when reseting
     /*FlexThumb();
@@ -141,9 +141,7 @@ void setup()
 void loop()
 {
     //////////////// Test code ////////////////
-    //digitalWrite(LEDTemp, LOW);
-    futemasPeEl = digitalRead(LEDTemp);
-    Serial.println(futemasPeEl);
+    // 
     ////////////////// Good code ////////////////
 
     //// Temp -- will be replaced with the sensor variant
@@ -307,52 +305,43 @@ void loop()
         }
     }
 
-    if (button_state = 1) {
+    if (button_state == LOW) {
         led_time = millis() - press_start;
 
-        if (led_time > 980 && led_time < 1020) {
+        if (led_time > 950 && led_time < 1050) {
 
-            if (digitalRead(LEDTemp == HIGH)) {
-                digitalWrite(LEDTemp, LOW);
-                delay(10);
-                digitalWrite(LEDTemp, HIGH);
-            }
+            digitalWrite(LEDTemp, LOW);
+            delay(10);
+            digitalWrite(LEDTemp, HIGH);
+
         }
 
-        if (led_time > 1980 && led_time < 2020) {
+        if (led_time > 1950 && led_time < 2050) {
 
-            if (digitalRead(LEDTemp == HIGH)) {
-                digitalWrite(LEDTemp, LOW);
-                delay(10);
-                digitalWrite(LEDTemp, HIGH);
-            }
+            digitalWrite(LEDTemp, LOW);
+            delay(10);
+            digitalWrite(LEDTemp, HIGH);
         }
 
-        if (led_time > 2980 && led_time < 3020) {
+        if (led_time > 2950 && led_time < 3050) {
 
-            if (digitalRead(LEDTemp == HIGH)) {
-                digitalWrite(LEDTemp, LOW);
-                delay(10);
-                digitalWrite(LEDTemp, HIGH);
-            }
+            digitalWrite(LEDTemp, LOW);
+            delay(10);
+            digitalWrite(LEDTemp, HIGH);
         }
 
-        if (led_time > 3980 && led_time < 4020) {
-
-            if (digitalRead(LEDTemp == HIGH)) {
-                digitalWrite(LEDTemp, LOW);
-                delay(10);
-                digitalWrite(LEDTemp, HIGH);
-            }
+        if (led_time > 3950 && led_time < 4050) {
+            
+            digitalWrite(LEDTemp, LOW);
+            delay(10);
+            digitalWrite(LEDTemp, HIGH);
         }
 
-        if (led_time > 4980 && led_time < 5020) {
+        if (led_time > 4950 && led_time < 5050) {
 
-            if (digitalRead(LEDTemp == HIGH)) {
-                digitalWrite(LEDTemp, LOW);
-                delay(10);
-                digitalWrite(LEDTemp, HIGH);
-            }
+            digitalWrite(LEDTemp, LOW);
+            delay(10);
+            digitalWrite(LEDTemp, HIGH);
         }
     }
 
@@ -1001,11 +990,9 @@ void UpdateButtonState() {
         press_start = millis();
         iddle_time = press_start - press_stop;
         digitalWrite(LEDTemp, HIGH);
-        Serial.println("aici??");
             
         if (iddle_time > 50 && iddle_time < 1800) {
             short_time = true;
-            Serial.print("Cretinule\n");
         }
     }
     else {
@@ -1081,7 +1068,7 @@ void TreatButtonAction() {
     press_counter = 0;
     previous_time = 0;
     iddle_time = 0;    
-    press_start = 2147483647;
+    //press_start = 2147483647;
 }
 
 // goes to the first grip mode in a group when the group is changed
@@ -1115,12 +1102,10 @@ void ChangeGripMode() {
 
             if (currentFree == freeModes::noThumb) {
                 currentFree = freeModes::withThumb;
-                Serial.println("WITH THUMB");
             }
 
             else {
                 currentFree = freeModes::noThumb;
-                Serial.println("WITHOUT THUMP");
             }
             break;
         }
