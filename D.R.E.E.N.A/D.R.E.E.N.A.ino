@@ -8,7 +8,7 @@
 #define Btn_1 9
 #define Btn_2 21
 
-#define LEDTemp 12
+#define LEDTemp 11
 #define servoDelay 5
 #define slowServoDelay 15
 #define maxIddleTime 2000
@@ -142,7 +142,7 @@ void loop()
 {
     //////////////// Test code ////////////////
     //digitalWrite(LEDTemp, LOW);
-
+    restart:
     ////////////////// Good code ////////////////
     
     //// Temp -- will be replaced with the sensor variant
@@ -195,7 +195,7 @@ void loop()
     if (are_servers_locked == false) {
         if (currentMode == opMode::freeMovement) {
 
-            if (system_firing == true && sensor_state == 1) { // if the button is pressed and "ON" || if the sensor senses signal and „ON”
+            if (system_firing == true && sensor_state == 1) { // if the button is pressed and "ON" || if the sensor senses signal and ï¿½ONï¿½
 
                 if (angle < 180) {
                     angle++;
@@ -344,22 +344,21 @@ void loop()
 }
 
 // ----------------------------- SLEEP MODE MANAGER -----------------------------
-void SleepMode() {
+void(*resetFunc) (void) = 0;
 
+void SleepMode() {
     DisplayClear();
     sleep_enable();
     attachInterrupt(2, WakeUp, LOW);
-    Serial.println("1");
-    set_sleep_mode(SLEEP_MODE_STANDBY);
-    //set_sleep_mode(SLEEP_MODE_PWR_DOWN);
-    delay(1000);
+    //set_sleep_mode(SLEEP_MODE_STANDBY);
+    set_sleep_mode(SLEEP_MODE_PWR_DOWN);
     sleep_cpu();
 }
 
 void WakeUp() {
-    Serial.println("muie a todos");
     sleep_disable();
-    detachInterrupt(Btn_2);
+    detachInterrupt(2);
+    resetFunc();
 }
 
 // ----------------------------- Functions implementations -----------------------------
@@ -1034,7 +1033,7 @@ void TreatButtonAction() {
         if (press_time >= 5000) {
             if (are_servers_locked == false) {
                 Serial.println("...Shut down...");
-                //SleepMode();
+                SleepMode();
             }
         }
 
