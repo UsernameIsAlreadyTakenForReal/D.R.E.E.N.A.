@@ -33,7 +33,7 @@ Servo pinky;
 bool are_servers_locked = false;
 
 int angle = 0;
-bool end;
+int futemasPeEl;
 
 // used in calculating the amount of time and number of times the button has been pressed
 int button_state = 1;
@@ -134,7 +134,7 @@ void setup()
     ExtendPinky();
     delay(1000);*/
 
-    digitalWrite(LEDTemp, LOW);
+    //digitalWrite(LEDTemp, LOW);
 }
 
 // Loop() function, this bit of code runs forever on the board
@@ -142,9 +142,10 @@ void loop()
 {
     //////////////// Test code ////////////////
     //digitalWrite(LEDTemp, LOW);
-    restart:
+    futemasPeEl = digitalRead(LEDTemp);
+    Serial.println(futemasPeEl);
     ////////////////// Good code ////////////////
-    
+
     //// Temp -- will be replaced with the sensor variant
     sensor_state = digitalRead(Btn_1);
 
@@ -310,33 +311,48 @@ void loop()
         led_time = millis() - press_start;
 
         if (led_time > 980 && led_time < 1020) {
-            digitalWrite(LEDTemp, LOW);
-            delay(10);
-            digitalWrite(LEDTemp, HIGH);
+
+            if (digitalRead(LEDTemp == HIGH)) {
+                digitalWrite(LEDTemp, LOW);
+                delay(10);
+                digitalWrite(LEDTemp, HIGH);
+            }
         }
 
         if (led_time > 1980 && led_time < 2020) {
-            digitalWrite(LEDTemp, LOW);
-            delay(10);
-            digitalWrite(LEDTemp, HIGH);
+
+            if (digitalRead(LEDTemp == HIGH)) {
+                digitalWrite(LEDTemp, LOW);
+                delay(10);
+                digitalWrite(LEDTemp, HIGH);
+            }
         }
 
         if (led_time > 2980 && led_time < 3020) {
-            digitalWrite(LEDTemp, LOW);
-            delay(10);
-            digitalWrite(LEDTemp, HIGH);
+
+            if (digitalRead(LEDTemp == HIGH)) {
+                digitalWrite(LEDTemp, LOW);
+                delay(10);
+                digitalWrite(LEDTemp, HIGH);
+            }
         }
 
         if (led_time > 3980 && led_time < 4020) {
-            digitalWrite(LEDTemp, LOW);
-            delay(10);
-            digitalWrite(LEDTemp, HIGH);
+
+            if (digitalRead(LEDTemp == HIGH)) {
+                digitalWrite(LEDTemp, LOW);
+                delay(10);
+                digitalWrite(LEDTemp, HIGH);
+            }
         }
 
         if (led_time > 4980 && led_time < 5020) {
-            digitalWrite(LEDTemp, LOW);
-            delay(10);
-            digitalWrite(LEDTemp, HIGH);
+
+            if (digitalRead(LEDTemp == HIGH)) {
+                digitalWrite(LEDTemp, LOW);
+                delay(10);
+                digitalWrite(LEDTemp, HIGH);
+            }
         }
     }
 
@@ -778,19 +794,7 @@ void DisplayInterrupt() {
     switch (display_interruption_type)
     {
         case 1: {
-            DisplayChooseDigit(0);
-            DisplayChar('b');
-            delay(5);
-            DisplayChooseDigit(1);
-            DisplayChar('A');
-            delay(5);
-            DisplayChooseDigit(2);
-            DisplayChar('t');
-            delay(5);
-            break;
-        }
 
-        case 2: {
             DisplayChooseDigit(0);
             DisplayChar('L');
             delay(5);
@@ -799,6 +803,26 @@ void DisplayInterrupt() {
             delay(5);
             DisplayChooseDigit(2);
             DisplayChar('c');
+            delay(5);
+            DisplayChooseDigit(3);
+            DisplayChar('1');
+            delay(5);
+            break;
+        }
+
+        case 2: {
+
+            DisplayChooseDigit(0);
+            DisplayChar('L');
+            delay(5);
+            DisplayChooseDigit(1);
+            DisplayChar('o');
+            delay(5);
+            DisplayChooseDigit(2);
+            DisplayChar('c');
+            delay(5);
+            DisplayChooseDigit(3);
+            DisplayChar('0');
             delay(5);
             break;
         }
@@ -1013,13 +1037,14 @@ void TreatButtonAction() {
         if (press_time >= 1000 && press_time < 3000) {
             Serial.println("...Locking Servos...");
             display_interruption_start_time = millis();
-            display_interruption_type = 2;
 
             if (are_servers_locked == false) {
+                display_interruption_type = 1;
                 are_servers_locked = true;
             }
             else {
                 are_servers_locked = false;
+                display_interruption_type = 2;
             }
         }
 
