@@ -54,11 +54,18 @@ int sensor_last_state = 0;
 bool system_firing = false;
 int led_time = 0;
 
-// 
+// operating modes
 opMode currentMode = opMode::freeMovement;
 freeModes currentFree = freeModes::noThumb; 
 gripModes currentGrip = gripModes::fist;
 gripGroups currentGroup = gripGroups::basic;
+bool isConfigMode = false;
+
+// CONFIG MODE state
+int config_state;
+int flex_vector_ext1[5] = { 0, 0, 1, 1, 0 };
+int flex_vector_ext2[5] = { 0, 1, 0, 1, 1 };
+int edit_index = 0;
 
 // used in Display Interruptions (Battery level and Locking Servos)
 int display_interruption_start_time;
@@ -144,208 +151,288 @@ void loop()
     // 
     ////////////////// Good code ////////////////
 
-    //// Temp -- will be replaced with the sensor variant
-    sensor_state = digitalRead(Btn_1);
+    if (isConfigMode == false) {
 
-    /*sensor_value = analogRead(sensorPin);
-    voltage = sensor_value * (5.0 / 1023.0);
+        //// Temp -- will be replaced with the sensor variant
+        sensor_state = digitalRead(Btn_1);
 
-    Serial.println(voltage);
+        /*sensor_value = analogRead(sensorPin);
+        voltage = sensor_value * (5.0 / 1023.0);
 
-    if (voltage > sensorThreshold) {
-        sensor_state = 1;
-    }
+        Serial.println(voltage);
 
-    else {
-        sensor_state = 0;
-    }*/
+        if (voltage > sensorThreshold) {
+            sensor_state = 1;
+        }
 
-    if (sensor_state != sensor_last_state) {
+        else {
+            sensor_state = 0;
+        }*/
 
-        if (sensor_state == 1) {
+        if (button_action_needs_consumption == true && sensor_state == 1) {
 
-            if (system_firing == false) {
+            display_interruption_type = 3;
+            display_interruption_start_time = millis();
+            button_action_needs_consumption = false;
+        }
 
-                system_firing = true;
-                Serial.println("On");
 
-                if (are_servers_locked == false) {
-                    if (currentMode == opMode::grips)
-                        FlexFingersWithGrip();
+
+        if (sensor_state != sensor_last_state) {
+
+            if (sensor_state == 1) {
+
+                if (system_firing == false) {
+
+                    system_firing = true;
+                    Serial.println("On");
+
+                    if (are_servers_locked == false) {
+                        if (currentMode == opMode::grips)
+                            FlexFingersWithGrip();
+                    }
                 }
-            }
 
-            else {
+                else {
 
-                system_firing = false;
-                Serial.println("Off"); 
-                
-                if (are_servers_locked == false) {
-                    if (currentMode == opMode::grips)
-                        ExtendFingersWithGrip();
+                    system_firing = false;
+                    Serial.println("Off");
+
+                    if (are_servers_locked == false) {
+                        if (currentMode == opMode::grips)
+                            ExtendFingersWithGrip();
+                    }
                 }
             }
         }
-    }
 
-    sensor_last_state = sensor_state;
+        sensor_last_state = sensor_state;
 
-    // Free mode rotations
-    if (are_servers_locked == false) {
-        if (currentMode == opMode::freeMovement) {
+        // Free mode rotations
+        if (are_servers_locked == false) {
+            if (currentMode == opMode::freeMovement) {
 
-            if (system_firing == true && sensor_state == 1) { // if the button is pressed and "ON" || if the sensor senses signal and �ON�
+                if (system_firing == true && sensor_state == 1) { // if the button is pressed and "ON" || if the sensor senses signal and �ON�
 
-                if (angle < 180) {
-                    angle++;
+                    if (angle < 180) {
+                        angle++;
 
 
-                    if (angle < indexMaxAngle) {
-                        index.write(angle);
-                    }
-
-                    if (middleMinAngle - angle >= middleMaxAngle) {
-                        middle.write(middleMinAngle - angle);
-                    }
-
-                    if (angle < ringMaxAngle) {
-                        ring.write(angle);
-                    }
-
-                    if (pinkyMinAngle - angle >= pinkyMaxAngle) {
-                        pinky.write(pinkyMinAngle - angle);
-                    }
-
-                    if (currentFree == freeModes::withThumb) {
-
-                        if (angle < thumbMaxAngle) {
-                            thumb.write(angle);
+                        if (angle < indexMaxAngle) {
+                            index.write(angle);
                         }
-                    }
-                    delay(slowServoDelay);
-                }
 
-            }
-
-            if (system_firing == false && sensor_state == 1) { // if the button is pressed and "OFF"
-
-                if (angle > 0) {
-                    angle--;
-
-                    if (angle > indexMinAngle) {
-                        index.write(angle);
-                    }
-
-                    if (middleMinAngle - angle >= middleMaxAngle) {
-                        middle.write(middleMinAngle - angle);
-                    }
-
-                    if (angle > ringMinAngle) {
-                        ring.write(angle);
-                    }
-
-                    if (pinkyMinAngle - angle >= pinkyMaxAngle) {
-                        pinky.write(pinkyMinAngle - angle);
-                    }
-
-                    if (currentFree == freeModes::withThumb) {
-                        if (angle > thumbMinAngle) {
-                            thumb.write(angle);
+                        if (middleMinAngle - angle >= middleMaxAngle) {
+                            middle.write(middleMinAngle - angle);
                         }
+
+                        if (angle < ringMaxAngle) {
+                            ring.write(angle);
+                        }
+
+                        if (pinkyMinAngle - angle >= pinkyMaxAngle) {
+                            pinky.write(pinkyMinAngle - angle);
+                        }
+
+                        if (currentFree == freeModes::withThumb) {
+
+                            if (angle < thumbMaxAngle) {
+                                thumb.write(angle);
+                            }
+                        }
+                        delay(slowServoDelay);
                     }
-                    delay(slowServoDelay);
+
+                }
+
+                if (system_firing == false && sensor_state == 1) { // if the button is pressed and "OFF"
+
+                    if (angle > 0) {
+                        angle--;
+
+                        if (angle > indexMinAngle) {
+                            index.write(angle);
+                        }
+
+                        if (middleMinAngle - angle >= middleMaxAngle) {
+                            middle.write(middleMinAngle - angle);
+                        }
+
+                        if (angle > ringMinAngle) {
+                            ring.write(angle);
+                        }
+
+                        if (pinkyMinAngle - angle >= pinkyMaxAngle) {
+                            pinky.write(pinkyMinAngle - angle);
+                        }
+
+                        if (currentFree == freeModes::withThumb) {
+                            if (angle > thumbMinAngle) {
+                                thumb.write(angle);
+                            }
+                        }
+                        delay(slowServoDelay);
+                    }
                 }
             }
         }
-    }
 
-    // this has to keep the display alive (since we use more than 1 letter)
-    // for the "interrupting" displays ( B A t -- flash -- %  || L o c 0 / L o c 1) I will have a bool "NeedsDisplayInterrupt" that, if on true, will go
-    // on to display the 2x2 possible thingies, and when the timer (i.e. millis() - interrupting_display_time_start) goes beyond 2 seconds, bool goes false
-    if (display_interruption_type == 0) {
-     
-        if (currentMode == opMode::freeMovement) {
-            UpdateDisplayFree();
+        // this has to keep the display alive (since we use more than 1 letter)
+        // for the "interrupting" displays (L o c 0 / L o c 1 || c o n F) I will have a bool "NeedsDisplayInterrupt" that, if on true, will go
+        // on to display the 2x2 possible thingies, and when the timer (i.e. millis() - interrupting_display_time_start) goes beyond 2 seconds, bool goes false
+        if (display_interruption_type == 0) {
+
+            if (currentMode == opMode::freeMovement) {
+                UpdateDisplayFree();
+            }
+
+            if (currentMode == opMode::grips) {
+                UpdateDisplayGrips();
+            }
         }
 
-        if (currentMode == opMode::grips) {
-            UpdateDisplayGrips();                   
-        }                                           
-    }        
-    
-    // if there is any kind of display interruption, we will display it accordignly
-    if (display_interruption_type != 0) {
-        DisplayInterrupt();
-        aux_timer_2 = millis() - display_interruption_start_time;
-        if (aux_timer_2 > 2000) {
-            display_interruption_type = 0;
+        // if there is any kind of display interruption, we will display it accordignly
+        if (display_interruption_type != 0) {
+            DisplayInterrupt();
+            aux_timer_2 = millis() - display_interruption_start_time;
+            if (aux_timer_2 > 2000) {
+
+                if (display_interruption_type == 3) {
+                    display_interruption_type = 0;
+                    isConfigMode = true;
+                    config_state = 1;
+                    DisplayClear();
+                }
+
+                else {
+                    display_interruption_type = 0;
+                }
+
+            }
         }
+
+        // Due to the nature of the Arcade button, and using INPUT_PULLUP for it to work, when not pressed, digitalRead(Btn_2) will return HIGH;
+        // we take the current state
+        button_state = digitalRead(Btn_2);
+
+        if (button_state != last_button_state) {    // if it has changed
+            UpdateButtonState();                    // fire the function
+        }
+
+        // then this piece of magic
+        last_button_state = button_state;
+
+        // since we can call millis() very quickly here, we can establish now if only one button was pressed
+        if (short_time == false) {
+            if (button_action_needs_consumption == true) {
+                aux_timer_1 = millis() - press_stop;
+                if (aux_timer_1 > maxIddleTime) {
+
+                    Serial.print("millis() - press_stop: "); Serial.print(aux_timer_1); Serial.print("\n");
+                    TreatButtonAction();
+                }
+            }
+        }
+
+        // Flickering light once each second to know that a second has passed
+        if (button_state == LOW) {
+            led_time = millis() - press_start;
+
+            if (led_time > 950 && led_time < 1050) {
+
+                digitalWrite(LEDTemp, LOW);
+                delay(10);
+                digitalWrite(LEDTemp, HIGH);
+
+            }
+
+            if (led_time > 1950 && led_time < 2050) {
+
+                digitalWrite(LEDTemp, LOW);
+                delay(10);
+                digitalWrite(LEDTemp, HIGH);
+            }
+
+            if (led_time > 2950 && led_time < 3050) {
+
+                digitalWrite(LEDTemp, LOW);
+                delay(10);
+                digitalWrite(LEDTemp, HIGH);
+            }
+
+            if (led_time > 3950 && led_time < 4050) {
+
+                digitalWrite(LEDTemp, LOW);
+                delay(10);
+                digitalWrite(LEDTemp, HIGH);
+            }
+
+            if (led_time > 4950 && led_time < 5050) {
+
+                digitalWrite(LEDTemp, LOW);
+                delay(10);
+                digitalWrite(LEDTemp, HIGH);
+            }
+        }
+
+        delay(sensorDelay);
     }
-     
-    // Due to the nature of the Arcade button, and using INPUT_PULLUP for it to work, when not pressed, digitalRead(Btn_2) will return HIGH;
-    // we take the current state
-    button_state = digitalRead(Btn_2);  
 
-    if (button_state != last_button_state) {    // if it has changed
-        UpdateButtonState();                    // fire the function
-    }
+    else if (isConfigMode == true) {
 
-    // then this piece of magic
-    last_button_state = button_state;
+        button_state = digitalRead(Btn_2);
 
-    // since we can call millis() very quickly here, we can establish now if only one button was pressed
-    if (short_time == false) {
-        if (button_action_needs_consumption == true) {
-            aux_timer_1 = millis() - press_stop;
-            if (aux_timer_1 > maxIddleTime) {
+        if (button_state != last_button_state) {    // if it has changed
+            UpdateButtonStateCONFIG();                    // fire the function
+        }
 
-                Serial.print("millis() - press_stop: "); Serial.print(aux_timer_1); Serial.print("\n");
-                TreatButtonAction();
+        // then this piece of magic
+        last_button_state = button_state;
+
+
+        UpdateDisplayCONFIG();
+
+        // Flickering light once each second to know that a second has passed
+        if (button_state == LOW) {
+            led_time = millis() - press_start;
+
+            if (led_time > 950 && led_time < 1050) {
+
+                digitalWrite(LEDTemp, LOW);
+                delay(10);
+                digitalWrite(LEDTemp, HIGH);
+
+            }
+
+            if (led_time > 1950 && led_time < 2050) {
+
+                digitalWrite(LEDTemp, LOW);
+                delay(10);
+                digitalWrite(LEDTemp, HIGH);
+            }
+
+            if (led_time > 2950 && led_time < 3050) {
+
+                digitalWrite(LEDTemp, LOW);
+                delay(10);
+                digitalWrite(LEDTemp, HIGH);
+            }
+
+            if (led_time > 3950 && led_time < 4050) {
+
+                digitalWrite(LEDTemp, LOW);
+                delay(10);
+                digitalWrite(LEDTemp, HIGH);
+            }
+
+            if (led_time > 4950 && led_time < 5050) {
+
+                digitalWrite(LEDTemp, LOW);
+                delay(10);
+                digitalWrite(LEDTemp, HIGH);
             }
         }
     }
-
-    if (button_state == LOW) {
-        led_time = millis() - press_start;
-
-        if (led_time > 950 && led_time < 1050) {
-
-            digitalWrite(LEDTemp, LOW);
-            delay(10);
-            digitalWrite(LEDTemp, HIGH);
-
-        }
-
-        if (led_time > 1950 && led_time < 2050) {
-
-            digitalWrite(LEDTemp, LOW);
-            delay(10);
-            digitalWrite(LEDTemp, HIGH);
-        }
-
-        if (led_time > 2950 && led_time < 3050) {
-
-            digitalWrite(LEDTemp, LOW);
-            delay(10);
-            digitalWrite(LEDTemp, HIGH);
-        }
-
-        if (led_time > 3950 && led_time < 4050) {
-            
-            digitalWrite(LEDTemp, LOW);
-            delay(10);
-            digitalWrite(LEDTemp, HIGH);
-        }
-
-        if (led_time > 4950 && led_time < 5050) {
-
-            digitalWrite(LEDTemp, LOW);
-            delay(10);
-            digitalWrite(LEDTemp, HIGH);
-        }
-    }
-
-    delay(sensorDelay);
 }
 
 // ----------------------------- SLEEP MODE MANAGER -----------------------------
@@ -363,10 +450,11 @@ void SleepMode() {
 void WakeUp() {
     sleep_disable();
     detachInterrupt(2);
-    resetFunc();
+    //resetFunc();
 }
 
 // ----------------------------- Functions implementations -----------------------------
+// ------------------------------ of normal running mode -------------------------------
 // of functions that couldn't be implemented in Definitions.cpp
 
 
@@ -583,13 +671,34 @@ void FlexFingersWithGrip() {
         }
         case gripModes::extra1: {
             
-            for (angle = 0; angle < 180; angle++) {
+            if (flex_vector_ext1[0] == 1) {
 
-                if (middleMinAngle - angle >= middleMaxAngle)
+                for (angle = 1; angle < 180; angle++) {
+
+                    thumb.write(angle);
+                    delay(servoDelay);
+                }
+            }
+
+            delay(100);
+
+            for (angle = 1; angle < 180; angle++) {
+
+                if (angle <= indexMaxAngle && flex_vector_ext1[1] == 1) {
+                    index.write(angle);
+                }
+
+                if ((middleMinAngle - angle >= middleMaxAngle) && flex_vector_ext1[2] == 1) {
                     middle.write(middleMinAngle - angle);
+                }
 
-                if (angle <= ringMaxAngle)
+                if (angle <= ringMaxAngle && flex_vector_ext1[3] == 1) {
                     ring.write(angle);
+                }
+
+                if ((pinkyMinAngle - angle >= pinkyMaxAngle) && flex_vector_ext1[4] == 1) {
+                    pinky.write(pinkyMinAngle - angle);
+                }
 
                 delay(servoDelay);
             }
@@ -597,16 +706,34 @@ void FlexFingersWithGrip() {
         }
         case gripModes::extra2: {
 
-            for (angle = 0; angle < 180; angle++) {
+            if (flex_vector_ext2[0] == 1) {
 
-                if (angle <= indexMaxAngle)
+                for (angle = 1; angle < 180; angle++) {
+
+                    thumb.write(angle);
+                    delay(servoDelay);
+                }
+            }
+
+            delay(100);
+
+            for (angle = 1; angle < 180; angle++) {
+
+                if (angle <= indexMaxAngle && flex_vector_ext2[1] == 1) {
                     index.write(angle);
+                }
 
-                if (angle <= ringMaxAngle)
+                if ((middleMinAngle - angle >= middleMaxAngle) && flex_vector_ext2[2] == 1) {
+                    middle.write(middleMinAngle - angle);
+                }
+
+                if (angle <= ringMaxAngle && flex_vector_ext2[3] == 1) {
                     ring.write(angle);
+                }
 
-                if (pinkyMinAngle - angle >= pinkyMaxAngle)
+                if ((pinkyMinAngle - angle >= pinkyMaxAngle) && flex_vector_ext2[4] == 1) {
                     pinky.write(pinkyMinAngle - angle);
+                }
 
                 delay(servoDelay);
             }
@@ -748,13 +875,25 @@ void ExtendFingersWithGrip() {
 
         for (angle = 180; angle > 0; angle--) {
 
-            if (middleMinAngle - angle >= middleMaxAngle)
+            if (angle <= indexMaxAngle && flex_vector_ext1[1] == 1)
+                index.write(angle);
+
+            if ((middleMinAngle - angle >= middleMaxAngle) && flex_vector_ext1[2] == 1)
                 middle.write(middleMinAngle - angle);
 
-            if (angle <= ringMaxAngle)
+            if (angle <= ringMaxAngle && flex_vector_ext1[3] == 1)
                 ring.write(angle);
 
+            if ((pinkyMinAngle - angle >= pinkyMaxAngle) && flex_vector_ext1[4] == 1)
+                pinky.write(pinkyMinAngle - angle);
+
             delay(servoDelay);
+        }
+
+        delay(100);
+
+        if (flex_vector_ext1[0] == 1) {
+            ExtendThumb();
         }
         break;
     }
@@ -762,16 +901,25 @@ void ExtendFingersWithGrip() {
 
         for (angle = 180; angle > 0; angle--) {
 
-            if (angle <= indexMaxAngle)
+            if (angle <= indexMaxAngle && flex_vector_ext2[1] == 1)
                 index.write(angle);
 
-            if (angle <= ringMaxAngle)
+            if ((middleMinAngle - angle >= middleMaxAngle) && flex_vector_ext2[2] == 1)
+                middle.write(middleMinAngle - angle);
+
+            if (angle <= ringMaxAngle && flex_vector_ext2[3] == 1)
                 ring.write(angle);
 
-            if (pinkyMinAngle - angle >= pinkyMaxAngle)
+            if ((pinkyMinAngle - angle >= pinkyMaxAngle) && flex_vector_ext2[4] == 1)
                 pinky.write(pinkyMinAngle - angle);
 
             delay(servoDelay);
+        }
+
+        delay(100);
+
+        if (flex_vector_ext2[0] == 1) {
+            ExtendThumb();
         }
         break;
     }
@@ -812,6 +960,23 @@ void DisplayInterrupt() {
             delay(5);
             DisplayChooseDigit(3);
             DisplayChar('0');
+            delay(5);
+            break;
+        }
+
+        case 3: {
+
+            DisplayChooseDigit(0);
+            DisplayChar('c');
+            delay(5);
+            DisplayChooseDigit(1);
+            DisplayChar('o');
+            delay(5);
+            DisplayChooseDigit(2);
+            DisplayChar('n');
+            delay(5);
+            DisplayChooseDigit(3);
+            DisplayChar('F');
             delay(5);
             break;
         }
@@ -1056,7 +1221,23 @@ void TreatButtonAction() {
         if (are_servers_locked == false) {
 
             if (currentMode == opMode::grips) {
-                ++currentGroup;
+
+                if (currentGrip == gripModes::pinchNoFingers) {
+                    ExtendPinky();
+                    ExtendRing();
+                    ExtendMiddle();
+                    ++currentGroup;
+                }
+
+                else if (currentGrip == gripModes::tripodNoFingers) {
+                    ExtendPinky();
+                    ExtendRing();
+                    ++currentGroup;
+                }
+
+                else {
+                    ++currentGroup;
+                }
                 UpdateGripMode();
             }
         }
@@ -1161,6 +1342,272 @@ void ChangeGripMode() {
     }
 
     PrintGripMode();
+}
+
+// ----------------------------- Functions implementations -----------------------------
+// ------------------------------ of CONFIG running mode -------------------------------
+
+void UpdateDisplayCONFIG() {
+
+    switch (config_state)
+    {
+        case 1: {
+            DisplayChooseDigit(0);
+            DisplayChar('E');
+            delay(5);
+            DisplayChooseDigit(1);
+            DisplayChar('X');
+            delay(5);
+            DisplayChooseDigit(2);
+            DisplayChar('t');
+            delay(5);
+            break;
+        }
+        case 11: {
+            DisplayChooseDigit(0);
+            DisplayChar('E');
+            delay(5);
+            DisplayChooseDigit(1);
+            DisplayChar('X');
+            delay(5);
+            DisplayChooseDigit(2);
+            DisplayChar('t');
+            delay(5);
+            DisplayChooseDigit(3);
+            DisplayChar('1');
+            delay(5);
+            break;
+        }
+        case 12: {
+            DisplayChooseDigit(0);
+            DisplayChar('E');
+            delay(5);
+            DisplayChooseDigit(1);
+            DisplayChar('X');
+            delay(5);
+            DisplayChooseDigit(2);
+            DisplayChar('t');
+            delay(5);
+            DisplayChooseDigit(3);
+            DisplayChar('2');
+            delay(5);
+            break;
+        }
+        case 111: {
+
+            if (flex_vector_ext1[edit_index] == 0) {
+                DisplayChooseDigit(0);
+                DisplayCharFromInt(edit_index);
+                delay(5);
+                DisplayChooseDigit(2);
+                DisplayChar('o');
+                delay(5);
+                DisplayChooseDigit(3);
+                DisplayChar('F');
+                delay(5);
+                break;
+
+            }
+
+            else if (flex_vector_ext1[edit_index] == 1) {
+                DisplayChooseDigit(0);
+                DisplayCharFromInt(edit_index);
+                delay(5);
+                DisplayChooseDigit(2);
+                DisplayChar('o');
+                delay(5);
+                DisplayChooseDigit(3);
+                DisplayChar('n');
+                delay(5);
+                break;
+
+            }
+
+            break;
+        }
+
+        case 121: {
+
+            if (flex_vector_ext2[edit_index] == 0) {
+                DisplayChooseDigit(0);
+                DisplayCharFromInt(edit_index);
+                delay(5);
+                DisplayChooseDigit(2);
+                DisplayChar('o');
+                delay(5);
+                DisplayChooseDigit(3);
+                DisplayChar('F');
+                delay(5);
+                break;
+
+            }
+
+            else if (flex_vector_ext2[edit_index] == 1) {
+                DisplayChooseDigit(0);
+                DisplayCharFromInt(edit_index);
+                delay(5);
+                DisplayChooseDigit(2);
+                DisplayChar('o');
+                delay(5);
+                DisplayChooseDigit(3);
+                DisplayChar('n');
+                delay(5);
+                break;
+
+            }
+
+            break;
+        }
+    }
+}
+
+void UpdateButtonStateCONFIG() {
+    if (button_state == LOW) {
+        press_start = millis();
+        iddle_time = press_start - press_stop;
+        digitalWrite(LEDTemp, HIGH);
+    }
+    else {
+        press_stop = millis();
+        press_time = press_stop - press_start;
+        digitalWrite(LEDTemp, LOW);
+
+        TreatButtonActionCONFIG();
+    }
+}
+
+void TreatButtonActionCONFIG() {
+
+    if (press_time >= 100 && press_time < 1000) {
+
+        switch (config_state)
+        {
+            case 1: {
+                config_state++;
+                break;
+            }
+            case 2: {
+                config_state--;
+                break;
+            }
+            case 11: {
+                config_state = 12;
+                break;
+            }
+            case 12: {
+                config_state = 11;
+                break;
+            }
+            case 111: {
+
+                flex_vector_ext1[edit_index] = 1 - flex_vector_ext1[edit_index];
+                break;
+            }
+            case 121: {
+
+                flex_vector_ext2[edit_index] = 1 - flex_vector_ext2[edit_index];
+                break;
+            }
+        }
+    }
+
+    if (press_time >= 1000 && press_time < 3000) {
+
+        switch (config_state)
+        {
+            case 1: {
+                config_state = 11;
+                break;
+            }
+            case 2: {
+                break;
+            }
+            case 11: {
+
+                config_state = 111;
+                edit_index = 0;
+                break;
+            }
+            case 12: {
+
+                config_state = 121;
+                edit_index = 0;
+                break;
+            }
+            case 111: {
+
+                if (edit_index < 4) {
+                    edit_index++;
+                }
+                else if (edit_index == 4) {
+                    config_state = 11;
+                }
+                break;
+            }
+            case 121: {
+
+                if (edit_index < 4) {
+                    edit_index++;
+                }
+                else if (edit_index == 4) {
+                    config_state = 12;
+                }
+                break;
+            }
+        }
+    }
+
+    if (press_time >= 3000 && press_time < 5000) {
+
+        switch (config_state)
+        {
+        case 1: {
+            isConfigMode = false;
+            break;
+        }
+        case 2: {
+            isConfigMode = false;
+            break;
+        }
+        case 11: {
+
+            config_state = 1;
+            break;
+        }
+        case 12: {
+
+            config_state = 1;
+            break;
+        }
+        case 111: {
+
+            if (edit_index > 0) {
+                edit_index--;
+            }
+            else if (edit_index == 0) {
+                config_state = 11;
+            }
+            break;
+        }
+        case 121: {
+
+            if (edit_index > 0) {
+                edit_index--;
+            }
+            else if (edit_index == 0) {
+                config_state = 12;
+            }
+            break;
+        }
+        }
+    }
+
+    if (press_time >= 5000) {
+
+        isConfigMode = false;
+    }
+
+
 }
 
 // Dev-Only functions

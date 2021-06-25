@@ -2,7 +2,63 @@
 #include "Definitions.h"
 #include <Arduino.h>
 
+// Display from Int
+void DisplayCharFromInt(int let) {
 
+    switch (let) 
+    {
+        case 0: { // display 1, actually
+            digitalWrite(disP1, LOW);
+            digitalWrite(disP2, HIGH);
+            digitalWrite(disP3, HIGH);
+            digitalWrite(disP4, LOW);
+            digitalWrite(disP5, LOW);
+            digitalWrite(disP6, LOW);
+            digitalWrite(disP7, LOW);
+            break;
+        }
+        case 1: { // display 2, actually
+            digitalWrite(disP1, HIGH);
+            digitalWrite(disP2, HIGH);
+            digitalWrite(disP3, LOW);
+            digitalWrite(disP4, HIGH);
+            digitalWrite(disP5, HIGH);
+            digitalWrite(disP6, LOW);
+            digitalWrite(disP7, HIGH);
+            break;
+        }
+        case 2: { // display 3, actually
+            digitalWrite(disP1, HIGH);
+            digitalWrite(disP2, HIGH);
+            digitalWrite(disP3, HIGH);
+            digitalWrite(disP4, HIGH);
+            digitalWrite(disP5, LOW);
+            digitalWrite(disP6, LOW);
+            digitalWrite(disP7, HIGH);
+            break;
+        }
+        case 3: { // display 4, actually
+            digitalWrite(disP1, LOW);
+            digitalWrite(disP2, HIGH);
+            digitalWrite(disP3, HIGH);
+            digitalWrite(disP4, LOW);
+            digitalWrite(disP5, LOW);
+            digitalWrite(disP6, HIGH);
+            digitalWrite(disP7, HIGH);
+            break;
+        }
+        case 4: { // display 5, actually
+            digitalWrite(disP1, HIGH);
+            digitalWrite(disP2, LOW);
+            digitalWrite(disP3, HIGH);
+            digitalWrite(disP4, HIGH);
+            digitalWrite(disP5, LOW);
+            digitalWrite(disP6, HIGH);
+            digitalWrite(disP7, HIGH);
+            break;
+        }
+    }
+}
 
 // Display 
 void DisplayChar(char let) {
@@ -98,26 +154,6 @@ void DisplayChar(char let) {
         digitalWrite(disP7, HIGH);
         break;
     }
-    case '0': {
-        digitalWrite(disP1, HIGH);
-        digitalWrite(disP2, HIGH);
-        digitalWrite(disP3, HIGH);
-        digitalWrite(disP4, HIGH);
-        digitalWrite(disP5, HIGH);
-        digitalWrite(disP6, HIGH);
-        digitalWrite(disP7, LOW);
-        break;
-    }
-    case '1': {
-        digitalWrite(disP1, LOW);
-        digitalWrite(disP2, HIGH);
-        digitalWrite(disP3, HIGH);
-        digitalWrite(disP4, LOW);
-        digitalWrite(disP5, LOW);
-        digitalWrite(disP6, LOW);
-        digitalWrite(disP7, LOW);
-        break;
-    }
     case 'E': {
         digitalWrite(disP1, HIGH);
         digitalWrite(disP2, LOW);
@@ -165,6 +201,66 @@ void DisplayChar(char let) {
         digitalWrite(disP4, HIGH);
         digitalWrite(disP5, HIGH);
         digitalWrite(disP6, LOW);
+        digitalWrite(disP7, HIGH);
+        break;
+    }
+    case '0': {
+        digitalWrite(disP1, HIGH);
+        digitalWrite(disP2, HIGH);
+        digitalWrite(disP3, HIGH);
+        digitalWrite(disP4, HIGH);
+        digitalWrite(disP5, HIGH);
+        digitalWrite(disP6, HIGH);
+        digitalWrite(disP7, LOW);
+        break;
+    }
+    case '1': {
+        digitalWrite(disP1, LOW);
+        digitalWrite(disP2, HIGH);
+        digitalWrite(disP3, HIGH);
+        digitalWrite(disP4, LOW);
+        digitalWrite(disP5, LOW);
+        digitalWrite(disP6, LOW);
+        digitalWrite(disP7, LOW);
+        break;
+    }
+    case '2': {
+        digitalWrite(disP1, HIGH);
+        digitalWrite(disP2, HIGH);
+        digitalWrite(disP3, LOW);
+        digitalWrite(disP4, HIGH);
+        digitalWrite(disP5, HIGH);
+        digitalWrite(disP6, LOW);
+        digitalWrite(disP7, HIGH);
+        break;
+    }
+    case '3': {
+        digitalWrite(disP1, HIGH);
+        digitalWrite(disP2, HIGH);
+        digitalWrite(disP3, HIGH);
+        digitalWrite(disP4, HIGH);
+        digitalWrite(disP5, LOW);
+        digitalWrite(disP6, LOW);
+        digitalWrite(disP7, HIGH);
+        break;
+    }
+    case '4': {
+        digitalWrite(disP1, LOW);
+        digitalWrite(disP2, HIGH);
+        digitalWrite(disP3, HIGH);
+        digitalWrite(disP4, LOW);
+        digitalWrite(disP5, HIGH);
+        digitalWrite(disP6, HIGH);
+        digitalWrite(disP7, HIGH);
+        break;
+    }
+    case '5': {
+        digitalWrite(disP1, HIGH);
+        digitalWrite(disP2, LOW);
+        digitalWrite(disP3, HIGH);
+        digitalWrite(disP4, HIGH);
+        digitalWrite(disP5, LOW);
+        digitalWrite(disP6, HIGH);
         digitalWrite(disP7, HIGH);
         break;
     }

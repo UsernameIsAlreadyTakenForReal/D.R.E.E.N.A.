@@ -101,6 +101,7 @@ inline opMode& operator++ (opMode& m) {
 
 
 //////////// Function Definitions ////////////
+////////////// for NORMAL modey //////////////
 
 // Button actions
 void TreatButtonAction();
@@ -134,6 +135,14 @@ void DisplayClear();
 void DisplayChooseDigit(int i);
 void DisplayInterrupt();
 
+
+//////////// Function Definitions ////////////
+////////////// for CONFIG modey //////////////
+
+void UpdateDisplayCONFIG();
+void TreatButtonActionCONFIG();
+void UpdateButtonStateCONFIG();
+void DisplayCharFromInt(int let);
 
 //////////// Dev-Only functions ////////////
 void PrintGripMode();
