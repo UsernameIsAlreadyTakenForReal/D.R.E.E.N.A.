@@ -55,7 +55,7 @@ bool system_firing = false;
 int led_time = 0;
 
 // operating modes
-opMode currentMode = opMode::freeMovement;
+opMode currentMode = opMode::grips;
 freeModes currentFree = freeModes::noThumb; 
 gripModes currentGrip = gripModes::fist;
 gripGroups currentGroup = gripGroups::basic;
@@ -96,6 +96,13 @@ void setup()
     middle.write(middleMinAngle);
     ring.write(ringMinAngle);
     pinky.write(pinkyMinAngle);
+
+
+    thumb.detach();
+    index.detach();
+    middle.detach();
+    ring.detach();
+    pinky.detach();
 
     pinMode(Btn_1, INPUT);
     pinMode(Btn_2, INPUT_PULLUP);
@@ -541,6 +548,13 @@ void ExtendPinky() {
 
 //////////////// Servo discerning ////////////////
 void FlexFingersWithGrip() {
+
+    thumb.attach(servoThumbPin);
+    index.attach(servoIndexPin);
+    middle.attach(servoMiddlePin);
+    ring.attach(servoRingPin);
+    pinky.attach(servoPinkyPin);
+
     switch (currentGrip)
     {
         case gripModes::fist: {
@@ -740,9 +754,22 @@ void FlexFingersWithGrip() {
             break;
         }
     }
+
+    thumb.detach();
+    index.detach();
+    middle.detach();
+    ring.detach();
+    pinky.detach();
 }
 
 void ExtendFingersWithGrip() {
+
+    thumb.attach(servoThumbPin);
+    index.attach(servoIndexPin);
+    middle.attach(servoMiddlePin);
+    ring.attach(servoRingPin);
+    pinky.attach(servoPinkyPin);
+
     switch (currentGrip)
     {
     case gripModes::fist: {
@@ -924,6 +951,12 @@ void ExtendFingersWithGrip() {
         break;
     }
     }
+
+    thumb.detach();
+    index.detach();
+    middle.detach();
+    ring.detach();
+    pinky.detach();
 }
 
 void DisplayInterrupt() {
