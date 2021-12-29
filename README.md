@@ -1,5 +1,5 @@
 # What is this?
-A myoelectric robot hand, initially designed to be a prosthesis. Each finger is individually operated by a SG-90 servomotor. Wrist is not rotating
+Digital Recreation of Ejected Extremities, Namely Arms (D.R.E.E.N.A.), a myoelectric robot hand, initially designed to be a prosthesis. Each finger is individually operated by a SG-90 servomotor. Wrist is not rotating
 
 This is my bachelor's degree project. As with all projects, it turned out way worse than I had expected; these kinds of projects require multiple iterations to get right, especially if you don't have experience with designing 3D objects that can be actually used. I only had one shot. Thanks, Eminem. I like how GitKraken looks, so I made a repo as well.
 
