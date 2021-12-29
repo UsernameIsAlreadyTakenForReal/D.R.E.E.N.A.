@@ -6,8 +6,13 @@ This is my bachelor's degree project. As with all projects, it turned out way wo
 # If, for any reason, you want to get this working too...
 which you shouldn't, since it requires a lot of stuff and there are easier projects to set up out there, here are some guides:
 
-## *For printing:*
+## *Pre- stuff that you need:*
+- Blender or convertor for .blend files if you want to change the 3D models;
+- A 3D printer. Project was printed with via Ultimaker Cura 4.8.0, with PLA
+- Arduino IDE, really. Project was created with Visual Studio 2019 and vMicro
+- .blend files go big or go home. Need LFS: https://git-lfs.github.com/
 
+## *For printing:*
 For simpletons, each .STL file has to be printed ONCE. The rest of this section is me licking my own arse. The palm is made up of three segments: the knuckles, the back of the hand and the knuckles. Thumb is one single object. Fingers are made up of two segments: proximal and distal. Distal has two segments, a _Body and a _Guard. 
 
 1. Fingers:
@@ -22,7 +27,6 @@ For simpletons, each .STL file has to be printed ONCE. The rest of this section 
    3. Wrist is just an object, so that's fine. 
 
 ## *Components needed:*
-
 Oh, boy...
 1. Arduino Mega 2560 or any board with at least 5 PWM pins, 13 digital pins and 1 analog pin;
 2. 1 myoelectric sensor. The code is written for a MyoWare AT-04-001;
@@ -41,7 +45,6 @@ Physical components...
 ![Note that servomotors are powered separately, though a 9V battery will not suffice. They need much, much more power](/Extra Files/Schema.png)
 
 ## *For other wirings:*
-
 Oh, boy 2.0... If you really made this this far and wish to continue (don't) please read everything before trying anything, and please test every component, electronic or not, before actually tying, knotting and glueing anything!
 1. Run a non-elastic chord (like fishing strings) through the small hole in each finger; make a knot at the fingertip. The knot will be hidden by the _distal_guard_ segments;
 2. Run an elastic chord through each finger's two big holes as to make an elongated elipsis that holds the finger together WITH the knuckles as well (knots!); by now you should have all 4 fingers attached to the knuckles and be able to pull the non-elastic chords to make the fingers flex;
@@ -50,3 +53,30 @@ Oh, boy 2.0... If you really made this this far and wish to continue (don't) ple
 5. Hope you have ø 2mm cylindric magnets lying around, 'cause you need them to hold Palm_Base and Palm_Interior together and still be able to open them up when needed;
 6. Run a non-elastic chord and an elastic chord through the thumb and Palm_Interior; good luck at making that knot with the servo's white extension!;
 7. Take all connectors from the servomotors out through the whole at the base of the palm. Add the wrist. And that's it.
+
+## *For understanding the project:*
+
+There are 2 modes of operation: with predefined grips and free mode. There are 4 groups of predefined grips, each with 2 grips:
+1. Basic
+   1. Fist
+   2. Grip
+2. Pinches
+   1. Pinch
+   2. PinchNoFingers
+3. Tripods
+   1. Tripod
+   2. TripodNoFingers
+4. Extra (programmable)
+   1. RockOn
+   2. Extra2 
+
+
+
+rapid (<1 sec) | 1 press   - change grip mode (two grip modes in a group)
+rapid (<1 sec) | 2 presses - next grip group
+
+slow (1 - 3 sec) | 1 press - lock
+
+v slow (3-5 sec) | 1 press - change op mode
+
+vv slow (>5 sec) | 1 press - shut down
