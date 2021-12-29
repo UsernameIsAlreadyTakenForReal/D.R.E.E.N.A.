@@ -42,7 +42,8 @@ Physical components...
 2. Non-elastic string of at most ø 0.5mm
 3. 10 ø 2mm cylindric magnets
 
-![Note that servomotors are powered separately, though a 9V battery will not suffice. They need much, much more power](/Extra Files/Schema.png)
+![Note that servomotors are powered separately, though a 9V battery will not suffice. They need much, much more power](/'Extra Files'/Schema.png)
+![Note that servomotors are powered separately, though a 9V battery will not suffice. They need much, much more power](https://github.com/UsernameIsAlreadyTakenForReal/Lincenta /blob/main/'Extra Files'/Schema.png?raw=true)
 
 ## *For other wirings:*
 Oh, boy 2.0... If you really made this this far and wish to continue (don't) please read everything before trying anything, and please test every component, electronic or not, before actually tying, knotting and glueing anything!
