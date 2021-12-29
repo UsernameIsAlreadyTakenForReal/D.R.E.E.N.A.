@@ -1,2 +1,4 @@
 # ignore .blend1 files, which are autosaves files, the same size as the normal .blend ones
 *.blend1
+
+D.R.E.E.N.A/Debug
