@@ -43,7 +43,7 @@ Physical components...
 3. 10 ø 2mm cylindric magnets
 
 ![Note that servomotors are powered separately, though a 9V battery will not suffice. They need much, much more power](/Extra_Files/Schema.png)
-![Note that servomotors are powered separately, though a 9V battery will not suffice. They need much, much more power](https://github.com/UsernameIsAlreadyTakenForReal/Lincenta/blob/main/Extra_Files/Schema.png?raw=true)
+Note that servomotors are powered separately, though a 9V battery will not suffice. They need much, much more power
 
 ## *For other wirings:*
 Oh, boy 2.0... If you really made this this far and wish to continue (don't) please read everything before trying anything, and please test every component, electronic or not, before actually tying, knotting and glueing anything!
@@ -55,9 +55,11 @@ Oh, boy 2.0... If you really made this this far and wish to continue (don't) ple
 6. Run a non-elastic chord and an elastic chord through the thumb and Palm_Interior; good luck at making that knot with the servo's white extension!;
 7. Take all connectors from the servomotors out through the whole at the base of the palm. Add the wrist. And that's it.
 
-## *For understanding the project:*
+![Blue for elastic chord. Purple for the non-elastic chord](/Extra_Files/StringsWithinFingers.png)
+Blue for elastic chord. Purple for the non-elastic chord
 
-There are 2 modes of operation: with predefined grips and free mode. There are 4 groups of predefined grips, each with 2 grips:
+## *For understanding the project:*
+There are 2 modes of operation: with predefined grips and free mode (which works like sh*t). There are 4 groups of predefined grips, each with 2 grips:
 1. Basic
    1. Fist
    2. Grip
@@ -72,11 +74,8 @@ There are 2 modes of operation: with predefined grips and free mode. There are 4
    2. Extra2 
 
 The button has these possible functions, based on pressing length and number of presses:
-   rapid (<1 sec) | 1 press   - change grip mode (two grip modes in a group)
-   rapid (<1 sec) | 2 presses - next grip group
-
-   slow (1 - 3 sec) | 1 press - lock servos
-
-   v slow (3-5 sec) | 1 press - change op mode
-
-   vv slow (>5 sec) | 1 press - shut down
+1. rapid (<1 sec) | 1 press   - change grip mode (two grip modes in a group)
+2. rapid (<1 sec) | 2 presses - next grip group
+3. slow (1 - 3 sec) | 1 press - lock servos
+4. v slow (3-5 sec) | 1 press - change op mode (predefined / free mode)
+5. vv slow (>5 sec) | 1 press - shut down
