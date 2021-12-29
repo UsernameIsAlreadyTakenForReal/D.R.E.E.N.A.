@@ -40,13 +40,13 @@ Oh, boy...
 8. Power supply for the servomotors;
 
 Physical components...
-1. Elastic string of at most ø 2mm (recommend ø 1.5mm)
-2. Non-elastic string of at most ø 0.5mm
-3. 10 ø 2mm cylindric magnets
+1. Elastic string of at most ø 2mm (recommend ø 1.5mm);
+2. Non-elastic string of at most ø 0.5mm;
+3. 10 ø 2mm cylindric magnets.
 
 ![Note that servomotors are powered separately, though a 9V battery will not suffice. They need much, much more power](/Extra_Files/Schema.png)
 
-Note that servomotors are powered separately, though a 9V battery will not suffice. They need much, much more power
+Note that servomotors are powered separately, though a 9V battery will not suffice. They need much, much more power.
 
 ## *For other wirings:*
 Oh, boy 2.0... If you really made this this far and wish to continue (don't) please read everything before trying anything, and please test every component, electronic or not, before actually tying, knotting and glueing anything!
@@ -60,7 +60,7 @@ Oh, boy 2.0... If you really made this this far and wish to continue (don't) ple
 
 ![Blue for elastic chord. Purple for the non-elastic chord](/Extra_Files/StringsWithinFingers.png)
 
-Blue for elastic chord. Purple for the non-elastic chord
+Blue for elastic chord. Purple for the non-elastic chord.
 
 ## *For understanding the project:*
 There are 2 modes of operation: with predefined grips and free mode (which works like sh*t). There are 4 groups of predefined grips, each with 2 grips:
