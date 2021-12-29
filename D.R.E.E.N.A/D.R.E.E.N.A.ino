@@ -161,9 +161,9 @@ void loop()
     if (isConfigMode == false) {
 
         //// Temp -- will be replaced with the sensor variant
-        sensor_state = digitalRead(Btn_1);
+        //sensor_state = digitalRead(Btn_1);
 
-        /*sensor_value = analogRead(sensorPin);
+        sensor_value = analogRead(sensorPin);
         voltage = sensor_value * (5.0 / 1023.0);
 
         Serial.println(voltage);
@@ -174,7 +174,7 @@ void loop()
 
         else {
             sensor_state = 0;
-        }*/
+        }
 
         if (button_action_needs_consumption == true && sensor_state == 1) {
 

@@ -8,7 +8,7 @@ which you shouldn't, since it requires a lot of stuff and there are easier proje
 
 ## *Pre- stuff that you need:*
 - Blender or convertor for .blend files if you want to change the 3D models;
-- A 3D printer. Project was printed with via Ultimaker Cura 4.8.0, with PLA
+- A 3D printer. Project was printed with Ender 3 Pro, via software Ultimaker Cura 4.8.0, with PLA 1.75mm grey material, with 0.16mm step
 - Arduino IDE, really. Project was created with Visual Studio 2019 and vMicro
 - .blend files go big or go home. Need LFS: https://git-lfs.github.com/
 
@@ -70,13 +70,12 @@ There are 2 modes of operation: with predefined grips and free mode. There are 4
    1. RockOn
    2. Extra2 
 
+The button has these possible functions, based on pressing length and number of presses:
+   rapid (<1 sec) | 1 press   - change grip mode (two grip modes in a group)
+   rapid (<1 sec) | 2 presses - next grip group
 
+   slow (1 - 3 sec) | 1 press - lock servos
 
-rapid (<1 sec) | 1 press   - change grip mode (two grip modes in a group)
-rapid (<1 sec) | 2 presses - next grip group
+   v slow (3-5 sec) | 1 press - change op mode
 
-slow (1 - 3 sec) | 1 press - lock
-
-v slow (3-5 sec) | 1 press - change op mode
-
-vv slow (>5 sec) | 1 press - shut down
+   vv slow (>5 sec) | 1 press - shut down
