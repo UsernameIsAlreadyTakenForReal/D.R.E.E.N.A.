@@ -43,6 +43,7 @@ Physical components...
 3. 10 ø 2mm cylindric magnets
 
 ![Note that servomotors are powered separately, though a 9V battery will not suffice. They need much, much more power](/Extra_Files/Schema.png)
+
 Note that servomotors are powered separately, though a 9V battery will not suffice. They need much, much more power
 
 ## *For other wirings:*
@@ -56,6 +57,7 @@ Oh, boy 2.0... If you really made this this far and wish to continue (don't) ple
 7. Take all connectors from the servomotors out through the whole at the base of the palm. Add the wrist. And that's it.
 
 ![Blue for elastic chord. Purple for the non-elastic chord](/Extra_Files/StringsWithinFingers.png)
+
 Blue for elastic chord. Purple for the non-elastic chord
 
 ## *For understanding the project:*
