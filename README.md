@@ -3,19 +3,19 @@ Digital Recreation of Ejected Extremities, Namely Arms (D.R.E.E.N.A.)
 
 A myoelectric robot hand, initially designed to be a prosthesis. Each finger is individually operated by a SG-90 servomotor. Wrist is not rotating.
 
-This is my bachelor's degree project. As with all projects, it turned out way worse than I had expected; these kinds of projects require multiple iterations to get right, especially if you don't have experience with designing 3D objects that can be actually used. I only had one shot. Thanks, Eminem. I like how GitKraken looks, so I made a repo as well.
+This is my bachelor's degree project. As with all projects, it turned out way worse than I had expected; these kinds of projects require multiple iterations to get right, especially if you don't have experience with designing 3D objects that can actually be used. I only had one shot. Thanks, Eminem. I like how GitKraken looks, so I made a repo as well.
 
 # If, for any reason, you want to get this working too...
 which you shouldn't, since it requires a lot of stuff and there are easier projects to set up out there that work way, way better, here are some guides:
 
 ## *Pre- stuff that you need:*
 - Blender or convertor for .blend files if you want to change the 3D models;
-- A 3D printer. Project was printed with Ender 3 Pro, via software Ultimaker Cura 4.8.0, with PLA 1.75mm grey material, with 0.16mm step
-- Arduino IDE, really. Project was created with Visual Studio 2019 and vMicro
-- .blend files go big or go home. Need LFS: https://git-lfs.github.com/
+- A 3D printer. Project was printed with Ender 3 Pro, via software Ultimaker Cura 4.8.0, with PLA 1.75mm grey material, with 0.16mm step;
+- Arduino IDE, really. Project was created with Visual Studio 2019 and vMicro;
+- .blend files go big or go home. Need LFS: https://git-lfs.github.com/ 
 
 ## *For printing:*
-For simpletons, each .STL file has to be printed ONCE. The rest of this section is me licking my own arse. The palm is made up of three segments: the knuckles, the back of the hand and the knuckles. Thumb is one single object. Fingers are made up of two segments: proximal and distal. Distal has two segments, a _Body and a _Guard. 
+For simpletons, each .STL file has to be printed ONCE. The palm is made up of three segments: the knuckles, the back of the hand and the knuckles. Thumb is one single object. Fingers are made up of two segments: proximal and distal. Distal has two segments, a _Body and a _Guard. 
 
 1. Fingers:
    1. Index finger and Middle finger have the same Proximal model (the longest one);
